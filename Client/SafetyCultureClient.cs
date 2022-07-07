@@ -9,7 +9,7 @@ using SafetyCulture.Model.Audits;
 
 namespace SafetyCulture.Client
 {
-	public class AuditClient
+	public class SafetyCultureClient
 	{
 		private readonly string BearerToken;
 		public  RestClient Client { get; set; }
@@ -19,9 +19,10 @@ namespace SafetyCulture.Client
 		/// Creates an audit
 		/// </summary>
 		/// <param name="bearerToken"></param>
-		public AuditClient(string bearerToken)
+		public SafetyCultureClient(string bearerToken)
 		{
 			BearerToken = bearerToken;
+			Client.AddDefaultHeader("Authorization", BearerToken);
 		}
 
 		/// <summary>
@@ -32,11 +33,16 @@ namespace SafetyCulture.Client
 		public async Task<Audit> GetAuditAsync(string auditID)
 		{
 			var request = new RestRequest("audits");
-			request.AddHeader("Authorization", BearerToken);
 			var response =await Client.ExecuteAsync(request);
 			return JsonSerializer.Deserialize<Audit>(response.Content)!;
 		}
 
+		public async Task<List<Model.Folders.FolderResponse>> GetFoldersAsync()
+        {
+			var request = new RestRequest("directory/v1/folders");
+			var response = await Client.ExecuteAsync(request);
+			return JsonSerializer.Deserialize<List<Model.Folders.FolderResponse>>(response.Content);
+        }
 		
 	}
 }
