@@ -46,5 +46,11 @@ namespace SafetyCulture.Model.Folders
         [JsonPropertyName("meta_label")]
         public string MetaLabel { get; set; } = default!;
 
+        [JsonPropertyName("members_count")]
+        public int MembersCount { get; set; }
+
+        [JsonPropertyName("deleted")]
+        public bool Deleted { get; set; }
+
     }
 }
