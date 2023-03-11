@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace SafetyCulture.Model.Audits
 {
-	public class HeaderItem
-	{
+    public class HeaderItem
+    {
         [JsonPropertyName("item_id")]
         public string ItemId { get; set; }
 

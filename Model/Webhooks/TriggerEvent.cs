@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SafetyCulture.Model.Webhooks
+﻿namespace SafetyCulture.Model.Webhooks
 {
-  
+
     public class TriggerEvent
     {
         public static TriggerEvent InspectionStarted = new TriggerEvent("TRIGGER_EVENT_INSPECTION_STARTED");
@@ -17,7 +11,7 @@ namespace SafetyCulture.Model.Webhooks
 
 
         private string t;
-        private TriggerEvent (string s)
+        private TriggerEvent(string s)
         {
             t = s;
         }

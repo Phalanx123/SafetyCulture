@@ -1,7 +1,6 @@
-using System.Text.Json.Serialization; 
-using System; 
+using System.Text.Json.Serialization;
 namespace SafetyCulture.Model.Audits
-{ 
+{
 
     public class Image
     {
