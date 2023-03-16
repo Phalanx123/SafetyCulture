@@ -2,8 +2,7 @@
 
 namespace SafetyCulture.Model.Folders
 {
-
-    public class FoldersResponse
+    public class FolderWithAncestor
     {
         [JsonPropertyName("folder")]
         public Folder Folder { get; set; }

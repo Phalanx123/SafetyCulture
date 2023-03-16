@@ -6,7 +6,7 @@ namespace SafetyCulture.Model.Webhooks
     public class Data
     {
         [JsonPropertyName("audit")]
-        public Audit Audit { get; set; }
+        public InspectionHeader Audit { get; set; }
 
         [JsonPropertyName("template")]
         public Template Template { get; set; }

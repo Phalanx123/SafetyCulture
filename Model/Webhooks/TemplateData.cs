@@ -6,7 +6,7 @@ namespace SafetyCulture.Model.Webhooks
     public class TemplateData
     {
         [JsonPropertyName("authorship")]
-        public Authorship Authorship { get; set; }
+        public AuthorshipLegacy Authorship { get; set; }
 
         [JsonPropertyName("metadata")]
         public Metadata Metadata { get; set; }
