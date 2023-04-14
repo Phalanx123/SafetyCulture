@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using SafetyCulture.Model.Assets;
 using SafetyCulture.Model.Audits;
 using SafetyCulture.Model.Folders;
 using System.Text.Json;
@@ -59,6 +60,33 @@ namespace SafetyCulture.Client
             text = "{\n \"result\": \n[" + text.Substring(1, text.Length - 3) + "]\n}";
             var result =  JsonSerializer.Deserialize<InspectionAnswersResponse>(text);
             return result;
+        }
+
+        public async Task<Guid> CreateAsset(Asset asset)
+        {
+            var request = new RestRequest($"/assets/v1/assets");
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+            };
+            var jsonContent = JsonSerializer.Serialize(asset, options);
+            request.AddBody(jsonContent);
+            var response = await Client.ExecutePostAsync<Asset>(request);
+            return response.Data.Id.Value;
+        }
+
+        public async Task<Asset> UpdateAsset(Asset asset)
+        {
+            var request = new RestRequest($"/assets/v1/assets/{asset.Id}", Method.Patch);
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+            };
+            asset.TypeId = default;
+            var jsonContent = JsonSerializer.Serialize(asset, options);
+            request.AddBody(jsonContent);
+            var response = await Client.ExecuteAsync<Asset>(request);
+            return response.Data;
         }
 
         /// <summary>

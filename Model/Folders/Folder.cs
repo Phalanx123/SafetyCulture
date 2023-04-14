@@ -8,12 +8,12 @@ namespace SafetyCulture.Model.Folders
         /// Unique ID
         /// </summary>
         [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         /// <summary>
         /// Name of the Site
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
+        public string? Name { get; set; } = default!;
         /// <summary>
         /// Organisational ID
         /// </summary>
