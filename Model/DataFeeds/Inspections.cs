@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SafetyCulture.Model.DataFeeds
 {
     // Root myDeserializedClass = JsonSerializer.Deserialize<Root>(myJsonResponse);
-    public class Datum
+    public class InspectionDatum
     {
         [JsonPropertyName("id")]
         public string? Id { get; set; }
@@ -95,7 +95,7 @@ namespace SafetyCulture.Model.DataFeeds
         public object Personnel { get; set; }
 
         [JsonPropertyName("client_site")]
-        public Guid? ClientSite { get; set; }
+        public string? ClientSite { get; set; }
 
         [JsonPropertyName("asset_id")]
         public Guid? AssetId { get; set; }
@@ -104,22 +104,13 @@ namespace SafetyCulture.Model.DataFeeds
         public string? WebReportLink { get; set; }
     }
 
-    public class Metadata
-    {
-        [JsonPropertyName("next_page")]
-        public string? NextPage { get; set; }
-
-        [JsonPropertyName("remaining_records")]
-        public int? RemainingRecords { get; set; }
-    }
-
     public class InspectionDataFeed
     {
         [JsonPropertyName("metadata")]
         public Metadata? Metadata { get; set; }
 
         [JsonPropertyName("data")]
-        public List<Datum>? Data { get; set; }
+        public List<InspectionDatum>? Data { get; set; }
     }
 
 

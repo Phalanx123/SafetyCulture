@@ -134,12 +134,13 @@ namespace SafetyCulture.Client
             return response.Data!;
         }
 
-        public async Task<InspectionDataFeed> GetInspectionDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived, bool? completed, bool publicWebReportLink)
+        public async Task<InspectionDataFeed> GetInspectionDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived, bool? completed, bool publicWebReportLink, string[]? templateIds)
         {
 
             var request = new RestRequest("feed/inspections", Method.Get);
             if (modifiedAfter != null) request.AddParameter("modified_after", modifiedAfter.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
             if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (templateIds != null) foreach (var templateId in templateIds) request.AddParameter("template", templateId);
             request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
             request.AddParameter("completed", Converter.NullableBoolToStringConverter(completed));
             request.AddParameter("web_report_link", publicWebReportLink ? "public" : "private");
@@ -154,6 +155,74 @@ namespace SafetyCulture.Client
             {
                 request = new RestRequest(response.Data.Metadata.NextPage);
                 response = await Client.ExecuteGetAsync<InspectionDataFeed>(request);
+                if (response.IsSuccessful)
+                    dataFeed.Data!.AddRange(response.Data!.Data!);
+            }
+            return dataFeed;
+        }
+
+		public async Task<TemplateDataFeed> GetTemplateDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived)
+		{
+
+			var request = new RestRequest("feed/templates", Method.Get);
+			if (modifiedAfter != null) request.AddParameter("modified_after", modifiedAfter.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+			if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+			request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
+			var response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
+			TemplateDataFeed dataFeed = new TemplateDataFeed();
+			if (response.IsSuccessful)
+			{
+				dataFeed = response.Data!;
+			}
+
+			while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+			{
+				request = new RestRequest(response.Data.Metadata.NextPage);
+				response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
+				if (response.IsSuccessful)
+					dataFeed.Data!.AddRange(response.Data!.Data!);
+			}
+			return dataFeed;
+		}
+        public async Task<TemplatePermissionsDataFeed> GetTemplatePermissionsDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived)
+        {
+
+            var request = new RestRequest("feed/template_permissions", Method.Get);
+            if (modifiedAfter != null) request.AddParameter("modified_after", modifiedAfter.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
+            var response = await Client.ExecuteGetAsync<TemplatePermissionsDataFeed>(request);
+            TemplatePermissionsDataFeed dataFeed = new TemplatePermissionsDataFeed();
+            if (response.IsSuccessful)
+            {
+                dataFeed = response.Data!;
+            }
+
+            while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+            {
+                request = new RestRequest(response.Data.Metadata.NextPage);
+                response = await Client.ExecuteGetAsync<TemplatePermissionsDataFeed>(request);
+                if (response.IsSuccessful)
+                    dataFeed.Data!.AddRange(response.Data!.Data!);
+            }
+            return dataFeed;
+        }
+
+        public async Task<GroupDataFeed> GetGroupDataFeedAsync()
+        {
+
+            var request = new RestRequest("feed/groups", Method.Get);
+            var response = await Client.ExecuteGetAsync<GroupDataFeed>(request);
+            GroupDataFeed dataFeed = new GroupDataFeed();
+            if (response.IsSuccessful)
+            {
+                dataFeed = response.Data!;
+            }
+
+            while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+            {
+                request = new RestRequest(response.Data.Metadata.NextPage);
+                response = await Client.ExecuteGetAsync<GroupDataFeed>(request);
                 if (response.IsSuccessful)
                     dataFeed.Data!.AddRange(response.Data!.Data!);
             }
