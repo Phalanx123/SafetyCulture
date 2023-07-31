@@ -1,9 +1,12 @@
-﻿using RestSharp;
+﻿using OneOf;
+using RestSharp;
 using SafetyCulture.Converters;
+using SafetyCulture.Model;
 using SafetyCulture.Model.Assets;
 using SafetyCulture.Model.Audits;
 using SafetyCulture.Model.DataFeeds;
 using SafetyCulture.Model.Folders;
+using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
 using System.Xml;
 
@@ -161,29 +164,29 @@ namespace SafetyCulture.Client
             return dataFeed;
         }
 
-		public async Task<TemplateDataFeed> GetTemplateDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived)
-		{
+        public async Task<TemplateDataFeed> GetTemplateDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived)
+        {
 
-			var request = new RestRequest("feed/templates", Method.Get);
-			if (modifiedAfter != null) request.AddParameter("modified_after", modifiedAfter.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
-			if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
-			request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
-			var response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
-			TemplateDataFeed dataFeed = new TemplateDataFeed();
-			if (response.IsSuccessful)
-			{
-				dataFeed = response.Data!;
-			}
+            var request = new RestRequest("feed/templates", Method.Get);
+            if (modifiedAfter != null) request.AddParameter("modified_after", modifiedAfter.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
+            var response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
+            TemplateDataFeed dataFeed = new TemplateDataFeed();
+            if (response.IsSuccessful)
+            {
+                dataFeed = response.Data!;
+            }
 
-			while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
-			{
-				request = new RestRequest(response.Data.Metadata.NextPage);
-				response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
-				if (response.IsSuccessful)
-					dataFeed.Data!.AddRange(response.Data!.Data!);
-			}
-			return dataFeed;
-		}
+            while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+            {
+                request = new RestRequest(response.Data.Metadata.NextPage);
+                response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
+                if (response.IsSuccessful)
+                    dataFeed.Data!.AddRange(response.Data!.Data!);
+            }
+            return dataFeed;
+        }
         public async Task<TemplatePermissionsDataFeed> GetTemplatePermissionsDataFeedAsync(DateTimeOffset? modifiedAfter, DateTimeOffset? modifiedBefore, bool? archived)
         {
 
@@ -227,6 +230,62 @@ namespace SafetyCulture.Client
                     dataFeed.Data!.AddRange(response.Data!.Data!);
             }
             return dataFeed;
+        }
+
+        public async Task<OneOf<ResponseSetItem, ResponseError>> UpdateGlobalResponseSetResponse(string id, string responseId, ResponseSetItem responseSet)
+        {
+            var request = new RestRequest($"/response_sets/{id}/responses/{responseId}", Method.Put);
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+            };
+            var jsonContent = JsonSerializer.Serialize(responseSet, options);
+            request.AddBody(jsonContent);
+            var response = await Client.ExecuteAsync(request);
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            {
+
+                var data = JsonSerializer.Deserialize<ResponseSetItemsResponse>(response.Content);
+                return data.ResponseSet;
+            }
+            else
+            {
+
+                var error = JsonSerializer.Deserialize<ResponseError>(response.Content);
+                return error;
+            }
+        }
+
+        public async Task<OneOf<ResponseSetResponse, ResponseError>> UpdateGlobalResponseSet(string id, IEnumerable<ResponseSetItem> responseSets)
+        {
+            return await UpdateGlobalResponseSet(id, new ResponseSet
+            {
+                Responses = responseSets.ToList()
+            });
+        }
+
+        public async Task<OneOf<ResponseSetResponse, ResponseError>> UpdateGlobalResponseSet(string id, ResponseSet responseSet)
+        {
+            var request = new RestRequest($"/response_sets/{id}", Method.Put);
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+            };
+            var jsonContent = JsonSerializer.Serialize(responseSet, options);
+            request.AddBody(jsonContent);
+            var response = await Client.ExecuteAsync(request);
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            {
+
+                var data = JsonSerializer.Deserialize<ResponseSetResponse>(response.Content);
+                return data;
+            }
+            else
+            {
+
+                var error = JsonSerializer.Deserialize<ResponseError>(response.Content);
+                return error;
+            }
         }
     }
 }

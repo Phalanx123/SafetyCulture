@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OneOf" Version="3.0.255" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
   </ItemGroup>
 
