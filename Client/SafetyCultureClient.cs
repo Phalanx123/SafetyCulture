@@ -6,6 +6,7 @@ using SafetyCulture.Model.Assets;
 using SafetyCulture.Model.Audits;
 using SafetyCulture.Model.DataFeeds;
 using SafetyCulture.Model.Folders;
+using SafetyCulture.Model.Incidents;
 using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
 using System.Xml;
@@ -122,12 +123,12 @@ namespace SafetyCulture.Client
 
         }
 
-        public async Task PostInspectionSiteAsync(string inspectionId, string siteId)
-        {
-            var request = new RestRequest($"inspections/v1/inspections/{inspectionId}/site", Method.Put);
-            request.AddJsonBody(new { site_id = siteId });
-            var response = await Client.ExecuteAsync(request);
-        }
+        //public async Task PostInspectionSiteAsync(string inspectionId, string siteId)
+        //{
+        //    var request = new RestRequest($"inspections/v1/inspections/{inspectionId}/site", Method.Put);
+        //    request.AddJsonBody(new { site_id = siteId });
+        //    var response = await Client.ExecuteAsync(request);
+        //}
 
         public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid? safetyCultureFolderID, IEnumerable<Guid?> assetIds)
         {
@@ -280,12 +281,43 @@ namespace SafetyCulture.Client
                 var data = JsonSerializer.Deserialize<ResponseSetResponse>(response.Content);
                 return data;
             }
-            else
-            {
 
-                var error = JsonSerializer.Deserialize<ResponseError>(response.Content);
-                return error;
-            }
+            var error = JsonSerializer.Deserialize<ResponseError>(response.Content);
+            return error;
         }
+
+        public async Task<OneOf<IncidentRoot, ResponseError>> GetIncidentsAsync(SafetyCultureRequest safetyCultureRequest)
+        {
+            var allIncidents = new IncidentRoot
+            {
+                Incidents = new List<Incident>()
+            };
+
+            string? pageToken = null;
+
+            do
+            {
+                var request = new RestRequest($"/tasks/v1/incidents/list");
+                if (pageToken is not null)
+                    request.AddParameter("page_token", pageToken);
+
+                var response = await Client.ExecutePostAsync<IncidentRoot>(request);
+
+                if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+                {
+                    allIncidents.Incidents.AddRange(response.Data.Incidents);
+                    pageToken = response.Data.NextPageToken;
+                }
+                else
+                {
+                    var error = JsonSerializer.Deserialize<ResponseError>(response.Content);
+                    return error;
+                }
+            }
+            while (!string.IsNullOrEmpty(pageToken));
+
+            return allIncidents;
+        }
+
     }
 }
