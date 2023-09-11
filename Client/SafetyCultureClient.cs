@@ -277,7 +277,6 @@ namespace SafetyCulture.Client
             var response = await Client.ExecuteAsync(request);
             if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
             {
-
                 var data = JsonSerializer.Deserialize<ResponseSetResponse>(response.Content);
                 return data;
             }
