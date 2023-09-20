@@ -149,7 +149,7 @@ namespace SafetyCulture.Client
             request.AddParameter("completed", Converter.NullableBoolToStringConverter(completed));
             request.AddParameter("web_report_link", publicWebReportLink ? "public" : "private");
             var response = await Client.ExecuteGetAsync<InspectionDataFeed>(request);
-            InspectionDataFeed dataFeed = new InspectionDataFeed();
+            var dataFeed = new InspectionDataFeed();
             if (response.IsSuccessful)
             {
                 dataFeed = response.Data!;
@@ -173,7 +173,7 @@ namespace SafetyCulture.Client
             if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
             request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
             var response = await Client.ExecuteGetAsync<TemplateDataFeed>(request);
-            TemplateDataFeed dataFeed = new TemplateDataFeed();
+            var dataFeed = new TemplateDataFeed();
             if (response.IsSuccessful)
             {
                 dataFeed = response.Data!;
@@ -196,7 +196,7 @@ namespace SafetyCulture.Client
             if (modifiedBefore != null) request.AddParameter("modified_before", modifiedBefore.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
             request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
             var response = await Client.ExecuteGetAsync<TemplatePermissionsDataFeed>(request);
-            TemplatePermissionsDataFeed dataFeed = new TemplatePermissionsDataFeed();
+            var dataFeed = new TemplatePermissionsDataFeed();
             if (response.IsSuccessful)
             {
                 dataFeed = response.Data!;
@@ -217,7 +217,7 @@ namespace SafetyCulture.Client
 
             var request = new RestRequest("feed/groups", Method.Get);
             var response = await Client.ExecuteGetAsync<GroupDataFeed>(request);
-            GroupDataFeed dataFeed = new GroupDataFeed();
+            var dataFeed = new GroupDataFeed();
             if (response.IsSuccessful)
             {
                 dataFeed = response.Data!;
