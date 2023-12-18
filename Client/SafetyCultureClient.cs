@@ -88,7 +88,10 @@ namespace SafetyCulture.Client
         {
             var request = new RestRequest($"/inspections/v1/answers/{inspectionID}");
             var response = await Client.ExecuteGetAsync<List<InspectionAnswerResponse>>(request);
-            return response.Data ?? new List<InspectionAnswerResponse>();
+           var modified = $"[{response.Content.Replace("}\n{","},\n{")}]";
+        var result = JsonSerializer.Deserialize<List<InspectionAnswerResponse>>(modified);
+        
+            return result ?? new List<InspectionAnswerResponse>();
         }
 
         public async Task<Guid> CreateAsset(Asset asset)
