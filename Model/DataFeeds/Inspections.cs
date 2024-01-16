@@ -11,10 +11,10 @@ namespace SafetyCulture.Model.DataFeeds
     public class InspectionDatum
     {
         [JsonPropertyName("id")]
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         [JsonPropertyName("archived")]
         public bool? Archived { get; set; }
@@ -50,10 +50,10 @@ namespace SafetyCulture.Model.DataFeeds
         public string? SiteId { get; set; }
 
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public required string TemplateId { get; set; }
 
         [JsonPropertyName("template_name")]
-        public string? TemplateName { get; set; }
+        public required string TemplateName { get; set; }
 
         [JsonPropertyName("template_author")]
         public string? TemplateAuthor { get; set; }
@@ -92,7 +92,7 @@ namespace SafetyCulture.Model.DataFeeds
         public DateTimeOffset? ConductedOn { get; set; }
 
         [JsonPropertyName("personnel")]
-        public object Personnel { get; set; }
+        public object? Personnel { get; set; }
 
         [JsonPropertyName("client_site")]
         public string? ClientSite { get; set; }

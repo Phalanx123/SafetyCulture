@@ -147,16 +147,10 @@ namespace SafetyCulture.Client
             var result = await Client.ExecuteAsync<FoldersResponse>(request);
             return result.Data;
         }
+        
 
-        //public async Task PostInspectionSiteAsync(string inspectionId, string siteId)
-        //{
-        //    var request = new RestRequest($"inspections/v1/inspections/{inspectionId}/site", Method.Put);
-        //    request.AddJsonBody(new { site_id = siteId });
-        //    var response = await Client.ExecuteAsync(request);
-        //}
-
-        public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid? safetyCultureFolderID,
-            IEnumerable<Guid?> assetIds)
+        public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid safetyCultureFolderID,
+            IEnumerable<Guid> assetIds)
         {
             var request = new RestRequest("assets/v1/assets:SetSiteForAssets", Method.Post);
             request.AddJsonBody(new { site = safetyCultureFolderID, asset_ids = assetIds });
