@@ -9,7 +9,6 @@ using SafetyCulture.Model.Folders;
 using SafetyCulture.Model.Incidents;
 using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
-using System.Xml;
 using SafetyCulture.Model.Templates;
 
 namespace SafetyCulture.Client
