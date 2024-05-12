@@ -90,7 +90,7 @@ namespace SafetyCulture.Client
            var modified = $"[{response.Content.Replace("}\n{","},\n{")}]";
         var result = JsonSerializer.Deserialize<List<InspectionAnswerResponse>>(modified);
         
-            return result ?? new List<InspectionAnswerResponse>();
+            return result ?? [];
         }
 
         public async Task<Guid> CreateAsset(Asset asset)
@@ -371,7 +371,7 @@ namespace SafetyCulture.Client
         {
             var allIncidents = new IncidentRoot
             {
-                Incidents = new List<Incident>()
+                Incidents = []
             };
 
             string? pageToken = null;
