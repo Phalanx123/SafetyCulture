@@ -51,7 +51,6 @@ namespace SafetyCulture.Client
 
             if (response is { IsSuccessful: true, Content: not null })
             {
-
                 using var jsonDoc = JsonDocument.Parse(response.Content);
                 if (jsonDoc.RootElement.TryGetProperty("url", out var urlElement) &&
                     urlElement.GetString() is { } url)
@@ -62,14 +61,12 @@ namespace SafetyCulture.Client
                 // Attempt to deserialize the content into a ResponseError object
                 var errorResponse = JsonSerializer.Deserialize<ResponseError>(response.Content);
                 return errorResponse;
-
-
             }
 
             throw new InvalidOperationException();
         }
 
-    /// <summary>
+        /// <summary>
         /// Gets an audit
         /// </summary>
         /// <param name="inspectionID">audit_xxxxxxxxxxxxxxxxxxxx</param>
@@ -87,9 +84,9 @@ namespace SafetyCulture.Client
         {
             var request = new RestRequest($"/inspections/v1/answers/{inspectionID}");
             var response = await Client.ExecuteGetAsync<List<InspectionAnswerResponse>>(request);
-           var modified = $"[{response.Content.Replace("}\n{","},\n{")}]";
-        var result = JsonSerializer.Deserialize<List<InspectionAnswerResponse>>(modified);
-        
+            var modified = $"[{response.Content.Replace("}\n{", "},\n{")}]";
+            var result = JsonSerializer.Deserialize<List<InspectionAnswerResponse>>(modified);
+
             return result ?? [];
         }
 
@@ -146,7 +143,7 @@ namespace SafetyCulture.Client
             var result = await Client.ExecuteAsync<FoldersResponse>(request);
             return result.Data;
         }
-        
+
 
         public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid safetyCultureFolderID,
             IEnumerable<Guid> assetIds)
@@ -342,7 +339,7 @@ namespace SafetyCulture.Client
             SafetyCultureTemplateFilter filter)
         {
             var request = new RestRequest($"/templates/search", Method.Get);
-    if (filter.Limit != default)
+            if (filter.Limit != default)
                 request.AddQueryParameter("limit", filter.Limit);
             if (filter.Order != default)
                 request.AddQueryParameter("order", filter.Order.Value.ToString().ToLower());
@@ -397,6 +394,66 @@ namespace SafetyCulture.Client
             } while (!string.IsNullOrEmpty(pageToken));
 
             return allIncidents;
+        }
+
+        public async Task<bool> CreateGlobalResponseSetResponse(string responseSetId, string label, string shortLabel)
+        {
+            try
+            {
+                var request = new RestRequest($"/response_sets/{responseSetId}/responses", Method.Post);
+                var payload = new
+                {
+                    label,
+                    short_label = shortLabel // Correct property name in the JSON payload
+                };
+
+                // Serialize payload using System.Text.Json
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                };
+                var jsonBody = JsonSerializer.Serialize(payload, jsonOptions);
+
+                // Add JSON body
+                request.AddStringBody(jsonBody, DataFormat.Json);
+
+                // Execute the request asynchronously
+                var response = await Client.ExecuteAsync(request);
+
+                // Check for success
+                return response.IsSuccessful;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteGlobalResponseSetResponse(string responseSetId, string? responseId)
+        {
+            try
+            {
+                var request = new RestRequest($"/response_sets/{responseSetId}/responses/{responseId}", Method.Delete);
+
+                // Execute the request asynchronously
+                var response = await Client.ExecuteAsync(request);
+
+                // Check for success
+                return response.IsSuccessful;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseSet?> GetGlobalResponseSet(string responseSetId)
+        {
+            var request = new RestRequest($"response_sets/{responseSetId}");
+            var result = await Client.ExecuteAsync<ResponseSet>(request);
+            if (result.IsSuccessful)
+                return result.Data;
+            throw new Exception("Failed to get response set");
         }
     }
 }
