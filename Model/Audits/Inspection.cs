@@ -54,6 +54,19 @@ namespace SafetyCulture.Model.Audits
 
         [JsonPropertyName("start_trigger")]
         public object StartTrigger { get; set; }
+        
+        [JsonPropertyName("score")]
+        public InspectionScore? Score { get; set; }
+    }
+    
+    
+    public class InspectionScore
+    {
+        [JsonPropertyName("total_score")]
+        public double? Score { get; set; }
+
+        [JsonPropertyName("score_percentage")]
+        public double? ScorePercentage { get; set; }
     }
 
     public class InspectionMedium
