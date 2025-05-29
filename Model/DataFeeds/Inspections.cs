@@ -9,7 +9,7 @@ namespace SafetyCulture.Model.DataFeeds
         public required string Id { get; set; }
 
         [JsonPropertyName("name")]
-        public required string Name { get; set; }
+        public required string? Name { get; set; }
 
         [JsonPropertyName("archived")]
         public bool? Archived { get; set; }
@@ -48,7 +48,7 @@ namespace SafetyCulture.Model.DataFeeds
         public required string TemplateId { get; set; }
 
         [JsonPropertyName("template_name")]
-        public required string TemplateName { get; set; }
+        public required string? TemplateName { get; set; }
 
         [JsonPropertyName("template_author")]
         public string? TemplateAuthor { get; set; }
