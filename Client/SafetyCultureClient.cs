@@ -9,6 +9,7 @@ using SafetyCulture.Model.Folders;
 using SafetyCulture.Model.Incidents;
 using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SafetyCulture.Model.Templates;
 
 namespace SafetyCulture.Client
@@ -92,10 +93,10 @@ namespace SafetyCulture.Client
 
         public async Task<Guid> CreateAsset(Asset asset)
         {
-            var request = new RestRequest($"/assets/v1/assets");
+            var request = new RestRequest("/assets/v1/assets");
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             var jsonContent = JsonSerializer.Serialize(asset, options);
             request.AddBody(jsonContent);
@@ -108,7 +109,7 @@ namespace SafetyCulture.Client
             var request = new RestRequest($"/assets/v1/assets/{asset.Id}", Method.Patch);
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             asset.TypeId = default;
             var jsonContent = JsonSerializer.Serialize(asset, options);
@@ -120,7 +121,6 @@ namespace SafetyCulture.Client
         /// <summary>
         /// Gets an audit
         /// </summary>
-        /// <param name="auditID">audit_xxxxxxxxxxxxxxxxxxxx</param>
         /// <returns></returns>
         public async Task<InspectionHeaderResponse> GetInspectionsAsync(string? templateId = null,
             DateTime? modifiedAfter = null, DateTime? modifiedBefore = null)
@@ -144,6 +144,22 @@ namespace SafetyCulture.Client
             return result.Data;
         }
 
+        public async Task<FolderResponse> UpdateFolderAsync(Guid safetyCultureFolderID, string folderDescription)
+        {
+            var request = new RestRequest($"directory/v1/folder/{safetyCultureFolderID}", Method.Patch);
+            var body = new
+            {
+                name = new { val = folderDescription }
+            };
+            request.AddJsonBody(body);
+            // execute and deserialize directly into your FolderResponse
+            
+            var response = await Client.ExecuteAsync<FolderResponse>(request);
+            // you might want to check response.IsSuccessful here
+            if (response is { IsSuccessful: true, Data: not null })
+                return response.Data;
+            throw new InvalidOperationException("Failed to update folder", response.ErrorException);
+        }
 
         public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid safetyCultureFolderID,
             IEnumerable<Guid> assetIds)
@@ -268,7 +284,7 @@ namespace SafetyCulture.Client
             var request = new RestRequest($"/inspection/v1/export", Method.Post);
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             var jsonContent = JsonSerializer.Serialize(export, options);
             request.AddBody(jsonContent);
@@ -290,7 +306,7 @@ namespace SafetyCulture.Client
             var request = new RestRequest($"/response_sets/{id}/responses/{responseId}", Method.Put);
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             var jsonContent = JsonSerializer.Serialize(responseSet, options);
             request.AddBody(jsonContent);
@@ -320,7 +336,7 @@ namespace SafetyCulture.Client
             var request = new RestRequest($"/response_sets/{id}", Method.Put);
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
             };
             var jsonContent = JsonSerializer.Serialize(responseSet, options);
             request.AddBody(jsonContent);
