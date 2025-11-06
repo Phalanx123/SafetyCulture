@@ -16,10 +16,7 @@ namespace SafetyCulture.Client
 {
     public class SafetyCultureClient
     {
-        private readonly string BearerToken;
-
-        public RestClient Client { get; set; }
-            = new RestClient(@"https://api.safetyculture.io/");
+        public RestClient Client { get; set; } = new(@"https://api.safetyculture.io/");
 
         /// <summary>
         /// Creates an audit
@@ -27,8 +24,8 @@ namespace SafetyCulture.Client
         /// <param name="bearerToken"></param>
         public SafetyCultureClient(string bearerToken)
         {
-            BearerToken = bearerToken;
-            Client.AddDefaultHeader("Authorization", BearerToken);
+            var bearerToken1 = bearerToken;
+            Client.AddDefaultHeader("Authorization", bearerToken1);
         }
 
         /// <summary>
