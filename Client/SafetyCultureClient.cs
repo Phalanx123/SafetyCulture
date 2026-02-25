@@ -1,4 +1,5 @@
-﻿using OneOf;
+﻿using System.Net;
+using OneOf;
 using RestSharp;
 using SafetyCulture.Converters;
 using SafetyCulture.Model;
@@ -467,6 +468,16 @@ namespace SafetyCulture.Client
             if (result.IsSuccessful)
                 return result.Data;
             throw new Exception("Failed to get response set");
+        }
+
+        public async Task<Guid?> CreateFolderAsync(CreateFolderRequest folder, CancellationToken ct)
+        {
+            var request = new RestRequest("directory/v1/folder", Method.Post);
+            request.AddJsonBody(folder);
+            var safetyCultureResponse = await Client.ExecutePostAsync<FolderResponse>(request, ct);
+
+         return safetyCultureResponse.Data?.Folder.Id;
+
         }
     }
 }
