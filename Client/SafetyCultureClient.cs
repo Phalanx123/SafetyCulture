@@ -17,6 +17,7 @@ namespace SafetyCulture.Client
 {
     public class SafetyCultureClient
     {
+        
         public RestClient Client { get; set; } = new(@"https://api.safetyculture.io/");
 
         /// <summary>
@@ -90,37 +91,37 @@ namespace SafetyCulture.Client
         }
 
         
-        public async Task<OneOf<SafetyCultureAssetType, ResponseError>> CreateAssetTypeAsync(string name)
+        public async Task<OneOf<SafetyCultureAssetTypeResponse, ResponseError>> CreateAssetTypeAsync(string name)
         {
-            var request = new RestRequest("/assets/v1/types", Method.Post);
+            if (string.IsNullOrWhiteSpace(name))
+                return new ResponseError { Message = "Asset type name cannot be empty." };
 
-            var payload = new
-            {
-                type = new
-                {
-                    name
-                }
-            };
+            if (name.Length > 130)
+                return new ResponseError { Message = $"Asset type name exceeds 130 character limit: '{name}' ({name.Length} chars)." };
+
+            var request = new RestRequest("/assets/v1/types", Method.Post);
 
             var jsonOptions = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             };
 
-            var jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
+            var jsonContent = JsonSerializer.Serialize(new { name }, jsonOptions);
             request.AddStringBody(jsonContent, DataFormat.Json);
 
             var response = await Client.ExecuteAsync(request);
 
-            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            if (!response.IsSuccessful || string.IsNullOrWhiteSpace(response.Content))
             {
-                var data = JsonSerializer.Deserialize<SafetyCultureAssetType>(response.Content!, jsonOptions);
-                return data!;
+                var error = JsonSerializer.Deserialize<ResponseError>(response.Content ?? string.Empty, jsonOptions);
+                return error!;
             }
 
-            var error = JsonSerializer.Deserialize<ResponseError>(response.Content!, jsonOptions);
-            return error!;
+            var data = JsonSerializer.Deserialize<SafetyCultureAssetTypeResponse>(response.Content, jsonOptions);
+            return data!;
         }
+        
         /// <summary>
         /// Gets an audit
         /// </summary>
