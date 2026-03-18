@@ -5,9 +5,6 @@ namespace SafetyCulture.Model.Assets
 {
     public class Field
     {
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
         [JsonPropertyName("string_value")]
         public string? StringValue { get; set; }
 

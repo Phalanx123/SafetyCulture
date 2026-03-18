@@ -17,7 +17,6 @@ namespace SafetyCulture.Client
 {
     public class SafetyCultureClient
     {
-        
         public RestClient Client { get; set; } = new(@"https://api.safetyculture.io/");
 
         /// <summary>
@@ -30,7 +29,7 @@ namespace SafetyCulture.Client
             Client.AddDefaultHeader("Authorization", bearerToken1);
         }
 
-         /// <summary>
+        /// <summary>
         /// Updates the name of an existing SafetyCulture asset type.
         /// Endpoint: PATCH /assets/v1/types/{id}
         /// </summary>
@@ -90,14 +89,15 @@ namespace SafetyCulture.Client
             return await UpdateAssetTypeAsync(id, request);
         }
 
-        
+
         public async Task<OneOf<SafetyCultureAssetTypeResponse, ResponseError>> CreateAssetTypeAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return new ResponseError { Message = "Asset type name cannot be empty." };
 
             if (name.Length > 130)
-                return new ResponseError { Message = $"Asset type name exceeds 130 character limit: '{name}' ({name.Length} chars)." };
+                return new ResponseError
+                    { Message = $"Asset type name exceeds 130 character limit: '{name}' ({name.Length} chars)." };
 
             var request = new RestRequest("/assets/v1/types", Method.Post);
 
@@ -121,7 +121,7 @@ namespace SafetyCulture.Client
             var data = JsonSerializer.Deserialize<SafetyCultureAssetTypeResponse>(response.Content, jsonOptions);
             return data!;
         }
-        
+
         /// <summary>
         /// Gets an audit
         /// </summary>
@@ -182,17 +182,85 @@ namespace SafetyCulture.Client
             return result ?? [];
         }
 
-        public async Task<Guid> CreateAsset(Asset asset)
+        public async Task<OneOf<string, ResponseError>> CreateAssetAsync(Asset asset)
         {
-            var request = new RestRequest("/assets/v1/assets");
-            var options = new JsonSerializerOptions
+            try
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
-            };
-            var jsonContent = JsonSerializer.Serialize(asset, options);
-            request.AddBody(jsonContent);
-            var response = await Client.ExecutePostAsync<Asset>(request);
-            return response.Data.Id.Value;
+                var request = new RestRequest("/assets/v1/assets", Method.Post);
+
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var jsonContent = JsonSerializer.Serialize(asset, jsonOptions);
+                request.AddStringBody(jsonContent, DataFormat.Json);
+
+                var response = await Client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful)
+                {
+                    if (!string.IsNullOrWhiteSpace(response.Content))
+                    {
+                        try
+                        {
+                            var error = JsonSerializer.Deserialize<ResponseError>(response.Content, jsonOptions);
+
+                            if (error is not null && !string.IsNullOrWhiteSpace(error.Message))
+                                return error;
+                        }
+                        catch
+                        {
+                            // fall through to generic error
+                        }
+                    }
+
+                    return new ResponseError
+                    {
+                        Message =
+                            $"Asset creation failed. StatusCode: {(int)response.StatusCode} ({response.StatusCode}). Content: {response.Content}"
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(response.Content))
+                {
+                    return new ResponseError
+                    {
+                        Message = "Asset created but response body was empty."
+                    };
+                }
+
+                try
+                {
+                    var data = JsonSerializer.Deserialize<CreateAssetResponse>(response.Content, jsonOptions);
+
+                    if (string.IsNullOrWhiteSpace(data?.Id))
+                    {
+                        return new ResponseError
+                        {
+                            Message = $"Asset created but ID was missing. Content: {response.Content}"
+                        };
+                    }
+
+                    return data.Id;
+                }
+                catch (Exception ex)
+                {
+                    return new ResponseError
+                    {
+                        Message = $"Failed to parse asset creation response: {ex.Message}. Content: {response.Content}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseError
+                {
+                    Message = $"Exception occurred while creating asset: {ex.Message}"
+                };
+            }
         }
 
         public async Task<Asset> UpdateAsset(Asset asset)
@@ -244,7 +312,7 @@ namespace SafetyCulture.Client
             };
             request.AddJsonBody(body);
             // execute and deserialize directly into your FolderResponse
-            
+
             var response = await Client.ExecuteAsync<FolderResponse>(request);
             // you might want to check response.IsSuccessful here
             if (response is { IsSuccessful: true, Data: not null })
@@ -569,8 +637,7 @@ namespace SafetyCulture.Client
             request.AddJsonBody(folder);
             var safetyCultureResponse = await Client.ExecutePostAsync<FolderResponse>(request, ct);
 
-         return safetyCultureResponse.Data?.Folder.Id;
-
+            return safetyCultureResponse.Data?.Folder.Id;
         }
     }
 }
