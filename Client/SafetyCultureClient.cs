@@ -29,6 +29,98 @@ namespace SafetyCulture.Client
             Client.AddDefaultHeader("Authorization", bearerToken1);
         }
 
+         /// <summary>
+        /// Updates the name of an existing SafetyCulture asset type.
+        /// Endpoint: PATCH /assets/v1/types/{id}
+        /// </summary>
+        /// <param name="id">The global unique identifier of the type.</param>
+        /// <param name="request">The asset type update request.</param>
+        /// <returns>
+        /// Updated asset type on success, otherwise a SafetyCulture error response.
+        /// </returns>
+        public async Task<OneOf<SafetyCultureAssetType, ResponseError>> UpdateAssetTypeAsync(
+            string id,
+            UpdateAssetTypeRequest request)
+        {
+            var restRequest = new RestRequest($"/assets/v1/types/{id}", Method.Patch);
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            };
+
+            var jsonContent = JsonSerializer.Serialize(request, jsonOptions);
+            restRequest.AddStringBody(jsonContent, DataFormat.Json);
+
+            var response = await Client.ExecuteAsync(restRequest);
+
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            {
+                var data = JsonSerializer.Deserialize<SafetyCultureAssetType>(response.Content!, jsonOptions);
+                return data!;
+            }
+
+            var error = JsonSerializer.Deserialize<ResponseError>(response.Content!, jsonOptions);
+            return error!;
+        }
+
+        /// <summary>
+        /// Convenience overload for renaming an existing SafetyCulture asset type.
+        /// SafetyCulture requires update_mask to specify which fields are being updated.
+        /// </summary>
+        /// <param name="id">The global unique identifier of the type.</param>
+        /// <param name="name">The new name for the type.</param>
+        /// <returns>
+        /// Updated asset type on success, otherwise a SafetyCulture error response.
+        /// </returns>
+        public async Task<OneOf<SafetyCultureAssetType, ResponseError>> UpdateAssetTypeAsync(
+            string id,
+            string name)
+        {
+            var request = new UpdateAssetTypeRequest
+            {
+                Type = new SafetyCultureAssetType
+                {
+                    Name = name
+                },
+                UpdateMask = "name"
+            };
+
+            return await UpdateAssetTypeAsync(id, request);
+        }
+
+        
+        public async Task<OneOf<SafetyCultureAssetType, ResponseError>> CreateAssetTypeAsync(string name)
+        {
+            var request = new RestRequest("/assets/v1/types", Method.Post);
+
+            var payload = new
+            {
+                type = new
+                {
+                    name
+                }
+            };
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            };
+
+            var jsonContent = JsonSerializer.Serialize(payload, jsonOptions);
+            request.AddStringBody(jsonContent, DataFormat.Json);
+
+            var response = await Client.ExecuteAsync(request);
+
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            {
+                var data = JsonSerializer.Deserialize<SafetyCultureAssetType>(response.Content!, jsonOptions);
+                return data!;
+            }
+
+            var error = JsonSerializer.Deserialize<ResponseError>(response.Content!, jsonOptions);
+            return error!;
+        }
         /// <summary>
         /// Gets an audit
         /// </summary>
