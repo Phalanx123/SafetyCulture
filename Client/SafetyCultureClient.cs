@@ -464,6 +464,32 @@ namespace SafetyCulture.Client
             return dataFeed;
         }
 
+        /// <summary>
+        /// Gets all user accounts in the organisation.
+        /// Endpoint: GET /feed/users
+        /// </summary>
+        /// <returns></returns>
+        public async Task<UserDataFeed> GetUserDataFeedAsync()
+        {
+            var request = new RestRequest("feed/users", Method.Get);
+            var response = await Client.ExecuteGetAsync<UserDataFeed>(request);
+            var dataFeed = new UserDataFeed();
+            if (response.IsSuccessful)
+            {
+                dataFeed = response.Data!;
+            }
+
+            while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+            {
+                request = new RestRequest(response.Data.Metadata.NextPage);
+                response = await Client.ExecuteGetAsync<UserDataFeed>(request);
+                if (response.IsSuccessful)
+                    dataFeed.Data!.AddRange(response.Data!.Data!);
+            }
+
+            return dataFeed;
+        }
+
         public async Task<OneOf<InspectionExportResult, ResponseError>> ExportInspection(InspectionExport export)
         {
             var request = new RestRequest($"/inspection/v1/export", Method.Post);
