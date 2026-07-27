@@ -278,11 +278,31 @@ namespace SafetyCulture.Client
         }
 
         /// <summary>
-        /// Gets an audit
+        /// Searches for inspections (audits) matching the given filters.
+        /// Endpoint: GET /audits/search
+        /// This is the lightweight "Search Inspections" endpoint - it returns only
+        /// audit_id/modified_at/template_id for each matching inspection, so it is
+        /// suited to polling for completed or recently modified inspections and then
+        /// following up with <see cref="GetInspectionAsync"/> for full detail.
+        /// For bulk export of complete inspection records, use <see cref="GetInspectionDataFeedAsync"/> instead.
         /// </summary>
+        /// <param name="templateId">Only return inspections created from this template.</param>
+        /// <param name="modifiedAfter">Only return inspections modified after this date/time.</param>
+        /// <param name="modifiedBefore">Only return inspections modified before this date/time.</param>
+        /// <param name="completed">
+        /// Filter by completion state: true for completed only, false for incomplete only,
+        /// null (default) to return both.
+        /// </param>
+        /// <param name="archived">
+        /// Filter by archived state: true for archived only, false for non-archived only,
+        /// null (default) to return both.
+        /// </param>
+        /// <param name="limit">Maximum number of results to return (API default/max apply if omitted).</param>
+        /// <param name="order">Sort order of results by modified_at, e.g. "asc" or "desc".</param>
         /// <returns></returns>
         public async Task<InspectionHeaderResponse> GetInspectionsAsync(string? templateId = null,
-            DateTime? modifiedAfter = null, DateTime? modifiedBefore = null)
+            DateTime? modifiedAfter = null, DateTime? modifiedBefore = null, bool? completed = null,
+            bool? archived = null, int? limit = null, string? order = null)
         {
             var request = new RestRequest("audits/search");
             if (templateId != null)
@@ -291,6 +311,12 @@ namespace SafetyCulture.Client
                 request.AddParameter("modified_after", modifiedAfter!.Value.ToString("o"));
             if (modifiedBefore != null)
                 request.AddParameter("modified_before", modifiedBefore!.Value.ToString("o"));
+            request.AddParameter("completed", Converter.NullableBoolToStringConverter(completed));
+            request.AddParameter("archived", Converter.NullableBoolToStringConverter(archived));
+            if (limit != null)
+                request.AddParameter("limit", limit.Value);
+            if (order != null)
+                request.AddParameter("order", order);
             var response = await Client.ExecuteAsync<InspectionHeaderResponse>(request);
             return response.Data;
         }
