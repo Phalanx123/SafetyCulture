@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using SafetyCulture.Converters;
 
 namespace SafetyCulture.Model.Users
 {
@@ -22,8 +23,9 @@ namespace SafetyCulture.Model.Users
         [JsonPropertyName("email")]
         public string? Email { get; set; }
 
+        [JsonConverter(typeof(Converter.EnumToStringConverter<SubscriptionSeatType>))]
         [JsonPropertyName("seat_type")]
-        public string? SeatType { get; set; }
+        public SubscriptionSeatType? SeatType { get; set; }
 
         [JsonPropertyName("timezone")]
         public string? Timezone { get; set; }
@@ -54,5 +56,15 @@ namespace SafetyCulture.Model.Users
 
         [JsonPropertyName("next_page_token")]
         public string? NextPageToken { get; set; }
+    }
+
+    public enum SubscriptionSeatType
+    {
+        SUBSCRIPTION_SEAT_TYPE_UNSPECIFIED,
+        SUBSCRIPTION_SEAT_TYPE_PREMIUM,
+        SUBSCRIPTION_SEAT_TYPE_COLLABORATOR,
+        SUBSCRIPTION_SEAT_TYPE_LITE,
+        SUBSCRIPTION_SEAT_TYPE_SERVICE_USER,
+        SUBSCRIPTION_SEAT_TYPE_SUPPORT
     }
 }
