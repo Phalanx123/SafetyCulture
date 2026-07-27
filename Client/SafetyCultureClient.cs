@@ -12,6 +12,7 @@ using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SafetyCulture.Model.Templates;
+using SafetyCulture.Model.Users;
 
 namespace SafetyCulture.Client
 {
@@ -466,28 +467,46 @@ namespace SafetyCulture.Client
 
         /// <summary>
         /// Gets all user accounts in the organisation.
-        /// Endpoint: GET /feed/users
+        /// Endpoint: POST /users/v1/users/list
         /// </summary>
         /// <returns></returns>
-        public async Task<UserDataFeed> GetUserDataFeedAsync()
+        public async Task<OneOf<List<SafetyCultureUser>, ResponseError>> GetUsersAsync()
         {
-            var request = new RestRequest("feed/users", Method.Get);
-            var response = await Client.ExecuteGetAsync<UserDataFeed>(request);
-            var dataFeed = new UserDataFeed();
-            if (response.IsSuccessful)
-            {
-                dataFeed = response.Data!;
-            }
+            var allUsers = new List<SafetyCultureUser>();
+            string? pageToken = null;
 
-            while (response.IsSuccessStatusCode && response.Data!.Metadata!.RemainingRecords != 0)
+            var jsonOptions = new JsonSerializerOptions
             {
-                request = new RestRequest(response.Data.Metadata.NextPage);
-                response = await Client.ExecuteGetAsync<UserDataFeed>(request);
-                if (response.IsSuccessful)
-                    dataFeed.Data!.AddRange(response.Data!.Data!);
-            }
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            };
 
-            return dataFeed;
+            do
+            {
+                var request = new RestRequest("/users/v1/users/list", Method.Post);
+                var body = new ListUsersRequest
+                {
+                    ListAll = true,
+                    PageToken = pageToken
+                };
+                var jsonContent = JsonSerializer.Serialize(body, jsonOptions);
+                request.AddStringBody(jsonContent, DataFormat.Json);
+
+                var response = await Client.ExecuteAsync(request);
+
+                if ((int)response.StatusCode < 200 || (int)response.StatusCode > 299)
+                {
+                    var error = JsonSerializer.Deserialize<ResponseError>(response.Content!, jsonOptions);
+                    return error!;
+                }
+
+                var data = JsonSerializer.Deserialize<ListUsersResponse>(response.Content!, jsonOptions);
+                if (data?.Users != null)
+                    allUsers.AddRange(data.Users);
+
+                pageToken = data?.NextPageToken;
+            } while (!string.IsNullOrEmpty(pageToken));
+
+            return allUsers;
         }
 
         public async Task<OneOf<InspectionExportResult, ResponseError>> ExportInspection(InspectionExport export)
