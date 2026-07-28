@@ -5,10 +5,10 @@ namespace SafetyCulture.Model.Audits
     public class Inspection
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public required string Id { get; set; }
 
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public required string TemplateId { get; set; }
 
         [JsonPropertyName("site_id")]
         public string SiteId { get; set; }
