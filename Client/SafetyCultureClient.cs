@@ -30,6 +30,13 @@ namespace SafetyCulture.Client
             Client.AddDefaultHeader("Authorization", bearerToken1);
         }
 
+        private static ResponseError EmptyBodyError(RestResponse response) =>
+            new()
+            {
+                Message =
+                    $"SafetyCulture API returned status {(int)response.StatusCode} ({response.StatusCode}) with an empty response body."
+            };
+
         /// <summary>
         /// Updates the name of an existing SafetyCulture asset type.
         /// Endpoint: PATCH /assets/v1/types/{id}
@@ -495,11 +502,17 @@ namespace SafetyCulture.Client
 
                 if ((int)response.StatusCode < 200 || (int)response.StatusCode > 299)
                 {
-                    var error = JsonSerializer.Deserialize<ResponseError>(response.Content!, jsonOptions);
+                    if (string.IsNullOrWhiteSpace(response.Content))
+                        return EmptyBodyError(response);
+
+                    var error = JsonSerializer.Deserialize<ResponseError>(response.Content, jsonOptions);
                     return error!;
                 }
 
-                var data = JsonSerializer.Deserialize<ListUsersResponse>(response.Content!, jsonOptions);
+                if (string.IsNullOrWhiteSpace(response.Content))
+                    return EmptyBodyError(response);
+
+                var data = JsonSerializer.Deserialize<ListUsersResponse>(response.Content, jsonOptions);
                 if (data?.Users != null)
                     allUsers.AddRange(data.Users);
 
@@ -519,6 +532,9 @@ namespace SafetyCulture.Client
             var jsonContent = JsonSerializer.Serialize(export, options);
             request.AddBody(jsonContent);
             var response = await Client.ExecuteAsync(request);
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
             if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
             {
                 var data = JsonSerializer.Deserialize<InspectionExportResult>(response.Content);
@@ -541,6 +557,9 @@ namespace SafetyCulture.Client
             var jsonContent = JsonSerializer.Serialize(responseSet, options);
             request.AddBody(jsonContent);
             var response = await Client.ExecuteAsync(request);
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
             if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
             {
                 var data = JsonSerializer.Deserialize<ResponseSetItemsResponse>(response.Content);
@@ -571,6 +590,9 @@ namespace SafetyCulture.Client
             var jsonContent = JsonSerializer.Serialize(responseSet, options);
             request.AddBody(jsonContent);
             var response = await Client.ExecuteAsync(request);
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
             if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
             {
                 var data = JsonSerializer.Deserialize<ResponseSetResponse>(response.Content);
@@ -599,6 +621,9 @@ namespace SafetyCulture.Client
                 request.AddQueryParameter("owner", filter.Owner.Value.ToString().ToLower());
 
             var response = await Client.ExecuteAsync(request);
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
             if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
             {
                 var data = JsonSerializer.Deserialize<SafetyCultureTemplateResponse>(response.Content);
