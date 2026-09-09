@@ -271,6 +271,48 @@ namespace SafetyCulture.Client
             }
         }
 
+        /// <summary>
+        /// Searches assets by keyword (matched against code and fields), for use in typeahead
+        /// pickers. Endpoint: POST /assets/v1/assets/list
+        /// </summary>
+        public async Task<OneOf<ListAssetsResponse, ResponseError>> ListAssetsAsync(
+            string? search = null,
+            int pageSize = 50,
+            string? pageToken = null,
+            CancellationToken ct = default)
+        {
+            var request = new RestRequest("/assets/v1/assets/list", Method.Post);
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            };
+
+            var body = new ListAssetsRequest
+            {
+                Search = search,
+                PageSize = pageSize,
+                PageToken = pageToken
+            };
+            var jsonContent = JsonSerializer.Serialize(body, jsonOptions);
+            request.AddStringBody(jsonContent, DataFormat.Json);
+
+            var response = await Client.ExecuteAsync(request, ct);
+
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+            {
+                var data = JsonSerializer.Deserialize<ListAssetsResponse>(response.Content, jsonOptions);
+                return data!;
+            }
+
+            var error = JsonSerializer.Deserialize<ResponseError>(response.Content, jsonOptions);
+            return error!;
+        }
+
         public async Task<Asset> UpdateAsset(Asset asset)
         {
             var request = new RestRequest($"/assets/v1/assets/{asset.Id}", Method.Patch);
