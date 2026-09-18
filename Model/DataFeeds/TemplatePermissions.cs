@@ -8,19 +8,19 @@ namespace SafetyCulture.Model.DataFeeds
         public string Id { get; set; }
 
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public string TemplateId { get; set; } = string.Empty;
 
         [JsonPropertyName("permission")]
-        public string Permission { get; set; }
+        public string Permission { get; set; } = string.Empty;
 
         [JsonPropertyName("assignee_type")]
-        public string AssigneeType { get; set; }
+        public string AssigneeType { get; set; } = string.Empty;
 
         [JsonPropertyName("assignee_id")]
-        public string AssigneeId { get; set; }
+        public string AssigneeId { get; set; } = string.Empty;
 
         [JsonPropertyName("organisation_id")]
-        public string OrganisationId { get; set; }
+        public string OrganisationId { get; set; } = string.Empty;
     }
 
 

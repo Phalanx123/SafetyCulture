@@ -6,10 +6,10 @@ namespace SafetyCulture.Model.Webhooks
     public class Webhook
     {
         [JsonPropertyName("webhook_id")]
-        public string WebhookId { get; set; }
+        public string WebhookId { get; set; } = string.Empty;
 
         [JsonPropertyName("trigger_events")]
-        public List<TriggerEvent> TriggerEvents { get; set; }
+        public List<TriggerEvent> TriggerEvents { get; set; } = [];
 
         [JsonPropertyName("url")]
         public string Url { get; set; }
@@ -18,7 +18,7 @@ namespace SafetyCulture.Model.Webhooks
         public string UserId { get; set; }
 
         [JsonPropertyName("organisation_id")]
-        public string OrganisationId { get; set; }
+        public string OrganisationId { get; set; } = string.Empty;
 
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }

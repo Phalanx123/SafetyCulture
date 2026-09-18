@@ -11,7 +11,7 @@ namespace SafetyCulture.Model.Audits
     public class Result
     {
         [JsonPropertyName("question_id")]
-        public string QuestionId { get; set; }
+        public string QuestionId { get; set; } = string.Empty;
 
         [JsonPropertyName("modified_at")]
         public DateTime? ModifiedAt { get; set; }
@@ -44,13 +44,13 @@ namespace SafetyCulture.Model.Audits
     public class AnswerDetails
     {
         [JsonPropertyName("responses")]
-        public List<string> Responses { get; set; }
+        public List<string> Responses { get; set; } = [];
 
         [JsonPropertyName("note")]
         public string Note { get; set; }
 
         [JsonPropertyName("media")]
-        public List<Media> Media { get; set; }
+        public List<Media> Media { get; set; } = [];
 
         [JsonPropertyName("attachments")]
         public Attachment Attachments { get; set; }
@@ -59,7 +59,7 @@ namespace SafetyCulture.Model.Audits
     public class TextAnswer
     {
         [JsonPropertyName("answer")]
-        public string Answer { get; set; }
+        public string Answer { get; set; } = string.Empty;
 
         [JsonPropertyName("attachments")]
         public Attachment Attachments { get; set; }
@@ -68,7 +68,7 @@ namespace SafetyCulture.Model.Audits
     public class MediaAnswer
     {
         [JsonPropertyName("media")]
-        public List<Media> Media { get; set; }
+        public List<Media> Media { get; set; } = [];
 
         [JsonPropertyName("attachments")]
         public Attachment Attachments { get; set; }
@@ -77,13 +77,13 @@ namespace SafetyCulture.Model.Audits
     public class ListAnswer
     {
         [JsonPropertyName("responses")]
-        public List<string> Responses { get; set; }
+        public List<string> Responses { get; set; } = [];
 
         [JsonPropertyName("note")]
         public string Note { get; set; }
 
         [JsonPropertyName("media")]
-        public List<Media> Media { get; set; }
+        public List<Media> Media { get; set; } = [];
 
         [JsonPropertyName("attachments")]
         public Attachment Attachments { get; set; }
@@ -122,10 +122,10 @@ namespace SafetyCulture.Model.Audits
         public string Name { get; set; }
 
         [JsonPropertyName("region")]
-        public string Region { get; set; }
+        public string Region { get; set; } = string.Empty;
 
         [JsonPropertyName("area")]
-        public string Area { get; set; }
+        public string Area { get; set; } = string.Empty;
     }
 
     public class Media
@@ -134,13 +134,13 @@ namespace SafetyCulture.Model.Audits
         public string Id { get; set; }
 
         [JsonPropertyName("token")]
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
 
         [JsonPropertyName("filename")]
-        public string Filename { get; set; }
+        public string Filename { get; set; } = string.Empty;
 
         [JsonPropertyName("media_type")]
-        public string MediaType { get; set; }
+        public string MediaType { get; set; } = string.Empty;
 
         [JsonPropertyName("created_at")]
         public DateTime? CreatedAt { get; set; }

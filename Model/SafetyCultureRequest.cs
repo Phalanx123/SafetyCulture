@@ -5,10 +5,10 @@ namespace SafetyCulture.Model
     public class SafetyCultureRequest
     {
         public int? PageSize { get; set; } = 100;
-        public string PageToken { get; set; }
+        public string PageToken { get; set; } = string.Empty;
         public string SortField { get; set; } = "SORT_FIELD_UNKNOWN";
         public string SortDirection { get; set; } = "SORT_DIRECTION_UNKNOWN";
-        public Filter[] Filters { get; set; }
+        public Filter[] Filters { get; set; } = [];
 
     }
     public class Filter
@@ -20,7 +20,7 @@ namespace SafetyCulture.Model
             public Guid PriorityId { get; set; }
 
             [JsonPropertyName("category_id")]
-            public string CategoryId { get; set; }
+            public string CategoryId { get; set; } = string.Empty;
 
             [JsonPropertyName("site_id")]
             public Guid SiteId { get; set; }

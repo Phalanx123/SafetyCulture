@@ -8,7 +8,7 @@ namespace SafetyCulture.Model.Webhooks
         public DateTime DateTriggered { get; set; }
 
         [JsonPropertyName("event_types")]
-        public List<string> EventTypes { get; set; }
+        public List<string> EventTypes { get; set; } = [];
 
         [JsonPropertyName("triggered_by")]
         public TriggeredBy TriggeredBy { get; set; }

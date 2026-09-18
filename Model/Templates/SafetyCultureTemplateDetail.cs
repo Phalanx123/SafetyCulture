@@ -14,7 +14,7 @@ namespace SafetyCulture.Model.Templates
         public string Id { get; set; }
 
         [JsonPropertyName("revision_id")]
-        public string RevisionId { get; set; }
+        public string RevisionId { get; set; } = string.Empty;
 
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -23,19 +23,19 @@ namespace SafetyCulture.Model.Templates
         public TemplatePermissions Permissions { get; set; }
 
         [JsonPropertyName("items")]
-        public List<TemplateItem> Items { get; set; }
+        public List<TemplateItem> Items { get; set; } = [];
 
         [JsonPropertyName("response_sets")]
-        public List<TemplateResponseSet> ResponseSets { get; set; }
+        public List<TemplateResponseSet> ResponseSets { get; set; } = [];
 
         [JsonPropertyName("global_response_sets")]
-        public List<TemplateResponseSet> GlobalResponseSets { get; set; }
+        public List<TemplateResponseSet> GlobalResponseSets { get; set; } = [];
 
         [JsonPropertyName("title_rules")]
-        public List<string> TitleRules { get; set; }
+        public List<string> TitleRules { get; set; } = [];
 
         [JsonPropertyName("media")]
-        public List<TemplateMedium> Media { get; set; }
+        public List<TemplateMedium> Media { get; set; } = [];
 
         [JsonPropertyName("mandatory_mark_as_complete")]
         public bool? MandatoryMarkAsComplete { get; set; }
@@ -62,7 +62,7 @@ namespace SafetyCulture.Model.Templates
         public TemplateMedium MetadataImage { get; set; }
 
         [JsonPropertyName("access_level")]
-        public string AccessLevel { get; set; }
+        public string AccessLevel { get; set; } = string.Empty;
 
         [JsonPropertyName("last_used")]
         public DateTimeOffset? LastUsed { get; set; }
@@ -71,7 +71,7 @@ namespace SafetyCulture.Model.Templates
         public DateTimeOffset? AddedAt { get; set; }
 
         [JsonPropertyName("revision_key")]
-        public string RevisionKey { get; set; }
+        public string RevisionKey { get; set; } = string.Empty;
 
         [JsonPropertyName("support_site_as_question_type")]
         public bool? SupportSiteAsQuestionType { get; set; }
@@ -80,13 +80,13 @@ namespace SafetyCulture.Model.Templates
         public DateTimeOffset? DateDraftModified { get; set; }
 
         [JsonPropertyName("draft_author_name")]
-        public string DraftAuthorName { get; set; }
+        public string DraftAuthorName { get; set; } = string.Empty;
 
         [JsonPropertyName("origin_information")]
         public object OriginInformation { get; set; }
 
         [JsonPropertyName("translation_id")]
-        public string TranslationId { get; set; }
+        public string TranslationId { get; set; } = string.Empty;
 
         [JsonPropertyName("is_locked_from_shared_library")]
         public bool? IsLockedFromSharedLibrary { get; set; }
@@ -95,7 +95,7 @@ namespace SafetyCulture.Model.Templates
         public TemplateSettings Settings { get; set; }
 
         [JsonPropertyName("document_links")]
-        public List<object> DocumentLinks { get; set; }
+        public List<object> DocumentLinks { get; set; } = [];
 
         [JsonPropertyName("procurement_order_settings")]
         public object ProcurementOrderSettings { get; set; }
@@ -104,19 +104,19 @@ namespace SafetyCulture.Model.Templates
     public class TemplatePermissions
     {
         [JsonPropertyName("edit")]
-        public List<TemplatePermissionEntry> Edit { get; set; }
+        public List<TemplatePermissionEntry> Edit { get; set; } = [];
 
         [JsonPropertyName("view")]
-        public List<TemplatePermissionEntry> View { get; set; }
+        public List<TemplatePermissionEntry> View { get; set; } = [];
 
         [JsonPropertyName("owner")]
         public List<TemplatePermissionEntry> Owner { get; set; }
 
         [JsonPropertyName("delete")]
-        public List<TemplatePermissionEntry> Delete { get; set; }
+        public List<TemplatePermissionEntry> Delete { get; set; } = [];
 
         [JsonPropertyName("context")]
-        public List<TemplatePermissionEntry> Context { get; set; }
+        public List<TemplatePermissionEntry> Context { get; set; } = [];
     }
 
     public class TemplatePermissionEntry
@@ -137,7 +137,7 @@ namespace SafetyCulture.Model.Templates
         public string Label { get; set; }
 
         [JsonPropertyName("children")]
-        public List<TemplateItem> Children { get; set; }
+        public List<TemplateItem> Children { get; set; } = [];
 
         [JsonPropertyName("section")]
         public TemplateSectionItem Section { get; set; }
@@ -200,7 +200,7 @@ namespace SafetyCulture.Model.Templates
     public class TemplateSectionItem
     {
         [JsonPropertyName("section_type")]
-        public string SectionType { get; set; }
+        public string SectionType { get; set; } = string.Empty;
 
         [JsonPropertyName("autoshares")]
         public object Autoshares { get; set; }
@@ -234,16 +234,16 @@ namespace SafetyCulture.Model.Templates
         public TemplateItemOptions Options { get; set; }
 
         [JsonPropertyName("text_format")]
-        public string TextFormat { get; set; }
+        public string TextFormat { get; set; } = string.Empty;
 
         [JsonPropertyName("calculation_data")]
         public object CalculationData { get; set; }
 
         [JsonPropertyName("unit_symbol")]
-        public string UnitSymbol { get; set; }
+        public string UnitSymbol { get; set; } = string.Empty;
 
         [JsonPropertyName("reading_config_id")]
-        public string ReadingConfigId { get; set; }
+        public string ReadingConfigId { get; set; } = string.Empty;
     }
 
     public class TemplateInstructionItem
@@ -258,10 +258,10 @@ namespace SafetyCulture.Model.Templates
         public TemplateItemOptions Options { get; set; }
 
         [JsonPropertyName("failed_responses")]
-        public List<string> FailedResponses { get; set; }
+        public List<string> FailedResponses { get; set; } = [];
 
         [JsonPropertyName("response_set_id")]
-        public string ResponseSetId { get; set; }
+        public string ResponseSetId { get; set; } = string.Empty;
 
         [JsonPropertyName("calculation_data")]
         public object CalculationData { get; set; }
@@ -273,10 +273,10 @@ namespace SafetyCulture.Model.Templates
         public TemplateItemOptions Options { get; set; }
 
         [JsonPropertyName("failed_responses")]
-        public List<string> FailedResponses { get; set; }
+        public List<string> FailedResponses { get; set; } = [];
 
         [JsonPropertyName("response_set_id")]
-        public string ResponseSetId { get; set; }
+        public string ResponseSetId { get; set; } = string.Empty;
 
         [JsonPropertyName("multiple_selection")]
         public bool? MultipleSelection { get; set; }
@@ -303,7 +303,7 @@ namespace SafetyCulture.Model.Templates
         public object SkipTo { get; set; }
 
         [JsonPropertyName("preset_action_type_ids")]
-        public List<string> PresetActionTypeIds { get; set; }
+        public List<string> PresetActionTypeIds { get; set; } = [];
 
         [JsonPropertyName("procurement_trigger")]
         public bool? ProcurementTrigger { get; set; }
@@ -312,7 +312,7 @@ namespace SafetyCulture.Model.Templates
     public class TemplateLogicFieldResponseIs
     {
         [JsonPropertyName("responses")]
-        public List<string> Responses { get; set; }
+        public List<string> Responses { get; set; } = [];
     }
 
     public class TemplateResponseSet
@@ -321,7 +321,7 @@ namespace SafetyCulture.Model.Templates
         public string Id { get; set; }
 
         [JsonPropertyName("responses")]
-        public List<TemplateResponseSetResponse> Responses { get; set; }
+        public List<TemplateResponseSetResponse> Responses { get; set; } = [];
 
         [JsonPropertyName("is_grs")]
         public bool? IsGrs { get; set; }
@@ -339,7 +339,7 @@ namespace SafetyCulture.Model.Templates
         public double? Score { get; set; }
 
         [JsonPropertyName("color")]
-        public string Color { get; set; }
+        public string Color { get; set; } = string.Empty;
 
         [JsonPropertyName("score_enabled")]
         public bool? ScoreEnabled { get; set; }
@@ -351,13 +351,13 @@ namespace SafetyCulture.Model.Templates
         public string Id { get; set; }
 
         [JsonPropertyName("token")]
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
 
         [JsonPropertyName("filename")]
-        public string Filename { get; set; }
+        public string Filename { get; set; } = string.Empty;
 
         [JsonPropertyName("media_type")]
-        public string MediaType { get; set; }
+        public string MediaType { get; set; } = string.Empty;
     }
 
     public class TemplatePerson

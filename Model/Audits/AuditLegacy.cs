@@ -37,24 +37,24 @@ namespace SafetyCulture.Model.Audits
     public class AuthorshipLegacy
     {
         [JsonPropertyName("device_id")]
-        public string DeviceId { get; set; }
+        public string DeviceId { get; set; } = string.Empty;
 
         [JsonPropertyName("owner")]
-        public string Owner { get; set; }
+        public string Owner { get; set; } = string.Empty;
 
         [JsonPropertyName("owner_id")]
-        public string OwnerId { get; set; }
+        public string OwnerId { get; set; } = string.Empty;
 
         [JsonPropertyName("author")]
-        public string Author { get; set; }
+        public string Author { get; set; } = string.Empty;
 
         [JsonPropertyName("author_id")]
-        public string AuthorId { get; set; }
+        public string AuthorId { get; set; } = string.Empty;
     }
     public class HeaderItemLegacy
     {
         [JsonPropertyName("item_id")]
-        public string ItemId { get; set; }
+        public string ItemId { get; set; } = string.Empty;
 
         [JsonPropertyName("label")]
         public string Label { get; set; }
@@ -66,10 +66,10 @@ namespace SafetyCulture.Model.Audits
         public ScoringLegacy Scoring { get; set; }
 
         [JsonPropertyName("children")]
-        public List<string> Children { get; set; }
+        public List<string> Children { get; set; } = [];
 
         [JsonPropertyName("parent_id")]
-        public string ParentId { get; set; }
+        public string ParentId { get; set; } = string.Empty;
 
         [JsonPropertyName("options")]
         public OptionsLegacy Options { get; set; }
@@ -84,22 +84,22 @@ namespace SafetyCulture.Model.Audits
         public DateTime? DateCreated { get; set; }
 
         [JsonPropertyName("file_ext")]
-        public string FileExt { get; set; }
+        public string FileExt { get; set; } = string.Empty;
 
         [JsonPropertyName("label")]
         public string Label { get; set; }
 
         [JsonPropertyName("media_id")]
-        public string MediaId { get; set; }
+        public string MediaId { get; set; } = string.Empty;
 
         [JsonPropertyName("href")]
-        public string Href { get; set; }
+        public string Href { get; set; } = string.Empty;
     }
 
     public class ItemLegacy
     {
         [JsonPropertyName("item_id")]
-        public string ItemId { get; set; }
+        public string ItemId { get; set; } = string.Empty;
 
         [JsonPropertyName("label")]
         public string Label { get; set; }
@@ -111,10 +111,10 @@ namespace SafetyCulture.Model.Audits
         public ScoringLegacy Scoring { get; set; }
 
         [JsonPropertyName("children")]
-        public List<string> Children { get; set; }
+        public List<string> Children { get; set; } = [];
 
         [JsonPropertyName("parent_id")]
-        public string ParentId { get; set; }
+        public string ParentId { get; set; } = string.Empty;
 
         [JsonPropertyName("options")]
         public OptionsLegacy Options { get; set; }
@@ -129,7 +129,7 @@ namespace SafetyCulture.Model.Audits
         public bool? Inactive { get; set; }
 
         [JsonPropertyName("media")]
-        public List<MediumLegacy> Media { get; set; }
+        public List<MediumLegacy> Media { get; set; } = [];
     }
 
     public class MediumLegacy
@@ -138,16 +138,16 @@ namespace SafetyCulture.Model.Audits
         public DateTime? DateCreated { get; set; }
 
         [JsonPropertyName("file_ext")]
-        public string FileExt { get; set; }
+        public string FileExt { get; set; } = string.Empty;
 
         [JsonPropertyName("label")]
         public string Label { get; set; }
 
         [JsonPropertyName("media_id")]
-        public string MediaId { get; set; }
+        public string MediaId { get; set; } = string.Empty;
 
         [JsonPropertyName("href")]
-        public string Href { get; set; }
+        public string Href { get; set; } = string.Empty;
     }
 
     public class MetadataLegacy
@@ -174,16 +174,16 @@ namespace SafetyCulture.Model.Audits
         public bool? EnableTime { get; set; }
 
         [JsonPropertyName("response_set")]
-        public string ResponseSet { get; set; }
+        public string ResponseSet { get; set; } = string.Empty;
 
         [JsonPropertyName("failed_responses")]
-        public List<object> FailedResponses { get; set; }
+        public List<object> FailedResponses { get; set; } = [];
 
         [JsonPropertyName("values")]
-        public List<string> Values { get; set; }
+        public List<string> Values { get; set; } = [];
 
         [JsonPropertyName("condition")]
-        public string Condition { get; set; }
+        public string Condition { get; set; } = string.Empty;
     }
 
     public class ResponsesLegacy
@@ -207,7 +207,7 @@ namespace SafetyCulture.Model.Audits
         public bool? Failed { get; set; }
 
         [JsonPropertyName("short_label")]
-        public string ShortLabel { get; set; }
+        public string ShortLabel { get; set; } = string.Empty;
 
         [JsonPropertyName("datetime")]
         public DateTime? Datetime { get; set; }
@@ -216,7 +216,7 @@ namespace SafetyCulture.Model.Audits
         public string Text { get; set; }
 
         [JsonPropertyName("selected")]
-        public List<SelectedLegacy> Selected { get; set; }
+        public List<SelectedLegacy> Selected { get; set; } = [];
 
         [JsonPropertyName("value")]
         public object? Value { get; set; }
@@ -235,10 +235,10 @@ namespace SafetyCulture.Model.Audits
     public class AuditLegacy
     {
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public string TemplateId { get; set; } = string.Empty;
 
         [JsonPropertyName("audit_id")]
-        public string AuditId { get; set; }
+        public string AuditId { get; set; } = string.Empty;
 
         [JsonPropertyName("archived")]
         public bool? Archived { get; set; }
@@ -298,7 +298,7 @@ namespace SafetyCulture.Model.Audits
         public int? Score { get; set; }
 
         [JsonPropertyName("short_label")]
-        public string ShortLabel { get; set; }
+        public string ShortLabel { get; set; } = string.Empty;
 
         [JsonPropertyName("failed")]
         public bool? Failed { get; set; }

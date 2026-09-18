@@ -6,7 +6,7 @@ namespace SafetyCulture.Model
     {
         public int Code { get; set; }
         public string Message { get; set; }
-        public List<Detail> Details { get; set; }
+        public List<Detail> Details { get; set; } = [];
 
     }
     public class Detail

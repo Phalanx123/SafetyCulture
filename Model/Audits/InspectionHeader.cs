@@ -5,13 +5,13 @@ namespace SafetyCulture.Model.Audits
     public class InspectionHeader
     {
         [JsonPropertyName("audit_id")]
-        public string AuditId { get; set; }
+        public string AuditId { get; set; } = string.Empty;
 
         [JsonPropertyName("modified_at")]
         public DateTime? ModifiedAt { get; set; }
 
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public string TemplateId { get; set; } = string.Empty;
     }
 
     public class InspectionHeaderResponse

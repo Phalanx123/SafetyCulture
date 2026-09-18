@@ -8,10 +8,10 @@ namespace SafetyCulture.Model.Folders
     public class FoldersResponse
     {
         [JsonPropertyName("folders")]
-        public List<FolderHeader> Folders { get; set; }
+        public List<FolderHeader> Folders { get; set; } = [];
 
         [JsonPropertyName("next_page_token")]
-        public string NextPageToken { get; set; }
+        public string NextPageToken { get; set; } = string.Empty;
 
         //[JsonPropertyName("folders_with_ancestors")]
         //public List<FolderWithAncestor> FoldersWithAncestors { get; set; }
@@ -38,7 +38,7 @@ namespace SafetyCulture.Model.Folders
         public Folder Folder { get; set; }
 
         [JsonPropertyName("ancestors")]
-        public List<FolderWithAncestor> Ancestors { get; set; }
+        public List<FolderWithAncestor> Ancestors { get; set; } = [];
 
         [JsonPropertyName("members_count")]
         public int? MembersCount { get; set; }

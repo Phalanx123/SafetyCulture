@@ -8,7 +8,7 @@ namespace SafetyCulture.Model.Folders
         public Folder Folder { get; set; }
 
         [JsonPropertyName("ancestors")]
-        public List<Folder> Ancestors { get; set; }
+        public List<Folder> Ancestors { get; set; } = [];
 
         [JsonPropertyName("members_count")]
         public int? MembersCount { get; set; }

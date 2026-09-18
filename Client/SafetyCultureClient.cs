@@ -711,53 +711,39 @@ namespace SafetyCulture.Client
 
         public async Task<bool> CreateGlobalResponseSetResponse(string responseSetId, string label, string shortLabel)
         {
-            try
+            var request = new RestRequest($"/response_sets/{responseSetId}/responses", Method.Post);
+            var payload = new
             {
-                var request = new RestRequest($"/response_sets/{responseSetId}/responses", Method.Post);
-                var payload = new
-                {
-                    label,
-                    short_label = shortLabel // Correct property name in the JSON payload
-                };
+                label,
+                short_label = shortLabel // Correct property name in the JSON payload
+            };
 
-                // Serialize payload using System.Text.Json
-                var jsonOptions = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-                };
-                var jsonBody = JsonSerializer.Serialize(payload, jsonOptions);
-
-                // Add JSON body
-                request.AddStringBody(jsonBody, DataFormat.Json);
-
-                // Execute the request asynchronously
-                var response = await Client.ExecuteAsync(request);
-
-                // Check for success
-                return response.IsSuccessful;
-            }
-            catch (Exception ex)
+            // Serialize payload using System.Text.Json
+            var jsonOptions = new JsonSerializerOptions
             {
-                throw;
-            }
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            };
+            var jsonBody = JsonSerializer.Serialize(payload, jsonOptions);
+
+            // Add JSON body
+            request.AddStringBody(jsonBody, DataFormat.Json);
+
+            // Execute the request asynchronously
+            var response = await Client.ExecuteAsync(request);
+
+            // Check for success
+            return response.IsSuccessful;
         }
 
         public async Task<bool> DeleteGlobalResponseSetResponse(string responseSetId, string? responseId)
         {
-            try
-            {
-                var request = new RestRequest($"/response_sets/{responseSetId}/responses/{responseId}", Method.Delete);
+            var request = new RestRequest($"/response_sets/{responseSetId}/responses/{responseId}", Method.Delete);
 
-                // Execute the request asynchronously
-                var response = await Client.ExecuteAsync(request);
+            // Execute the request asynchronously
+            var response = await Client.ExecuteAsync(request);
 
-                // Check for success
-                return response.IsSuccessful;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            // Check for success
+            return response.IsSuccessful;
         }
 
         public async Task<ResponseSet?> GetGlobalResponseSet(string responseSetId)

@@ -27,19 +27,19 @@ namespace SafetyCulture.Model.Incidents
         public bool? UseCategoryAccessWhitelist { get; set; }
 
         [JsonPropertyName("items")]
-        public List<object> Items { get; set; }
+        public List<object> Items { get; set; } = [];
     }
 
     public class Collaborator
     {
         [JsonPropertyName("collaborator_id")]
-        public string CollaboratorId { get; set; }
+        public string CollaboratorId { get; set; } = string.Empty;
 
         [JsonPropertyName("collaborator_type")]
-        public string CollaboratorType { get; set; }
+        public string CollaboratorType { get; set; } = string.Empty;
 
         [JsonPropertyName("assigned_role")]
-        public string AssignedRole { get; set; }
+        public string AssignedRole { get; set; } = string.Empty;
 
         [JsonPropertyName("contributor")]
         public Contributor Contributor { get; set; }
@@ -57,7 +57,7 @@ namespace SafetyCulture.Model.Incidents
         public string Email { get; set; }
 
         [JsonPropertyName("contact")]
-        public string Contact { get; set; }
+        public string Contact { get; set; } = string.Empty;
     }
 
     public class Creator
@@ -90,43 +90,43 @@ namespace SafetyCulture.Model.Incidents
         public IssueTask Task { get; set; }
 
         [JsonPropertyName("category_id")]
-        public string CategoryId { get; set; }
+        public string CategoryId { get; set; } = string.Empty;
 
         [JsonPropertyName("category")]
         public Category Category { get; set; }
 
         [JsonPropertyName("media")]
-        public List<Medium> Media { get; set; }
+        public List<Medium> Media { get; set; } = [];
 
         [JsonPropertyName("location")]
         public Location Location { get; set; }
 
         [JsonPropertyName("inspections")]
-        public List<object> Inspections { get; set; }
+        public List<object> Inspections { get; set; } = [];
     }
 
     public class Inspection
     {
         [JsonPropertyName("inspection_id")]
-        public string InspectionId { get; set; }
+        public string InspectionId { get; set; } = string.Empty;
 
         [JsonPropertyName("inspection_name")]
-        public string InspectionName { get; set; }
+        public string InspectionName { get; set; } = string.Empty;
     }
 
     public class InspectionItem
     {
         [JsonPropertyName("inspection_item_id")]
-        public string InspectionItemId { get; set; }
+        public string InspectionItemId { get; set; } = string.Empty;
 
         [JsonPropertyName("inspection_item_name")]
-        public string InspectionItemName { get; set; }
+        public string InspectionItemName { get; set; } = string.Empty;
 
         [JsonPropertyName("inspection_item_type")]
-        public string InspectionItemType { get; set; }
+        public string InspectionItemType { get; set; } = string.Empty;
 
         [JsonPropertyName("inspection_item_response_values")]
-        public List<object> InspectionItemResponseValues { get; set; }
+        public List<object> InspectionItemResponseValues { get; set; } = [];
     }
 
     public class Location
@@ -135,31 +135,31 @@ namespace SafetyCulture.Model.Incidents
         public string Name { get; set; }
 
         [JsonPropertyName("thoroughfare")]
-        public string Thoroughfare { get; set; }
+        public string Thoroughfare { get; set; } = string.Empty;
 
         [JsonPropertyName("sub_thoroughfare")]
-        public string SubThoroughfare { get; set; }
+        public string SubThoroughfare { get; set; } = string.Empty;
 
         [JsonPropertyName("locality")]
-        public string Locality { get; set; }
+        public string Locality { get; set; } = string.Empty;
 
         [JsonPropertyName("sub_locality")]
-        public string SubLocality { get; set; }
+        public string SubLocality { get; set; } = string.Empty;
 
         [JsonPropertyName("administrative_area")]
-        public string AdministrativeArea { get; set; }
+        public string AdministrativeArea { get; set; } = string.Empty;
 
         [JsonPropertyName("sub_administrative_area")]
-        public string SubAdministrativeArea { get; set; }
+        public string SubAdministrativeArea { get; set; } = string.Empty;
 
         [JsonPropertyName("postal_code")]
-        public string PostalCode { get; set; }
+        public string PostalCode { get; set; } = string.Empty;
 
         [JsonPropertyName("country")]
-        public string Country { get; set; }
+        public string Country { get; set; } = string.Empty;
 
         [JsonPropertyName("iso_country_code")]
-        public string IsoCountryCode { get; set; }
+        public string IsoCountryCode { get; set; } = string.Empty;
 
         [JsonPropertyName("geo_position")]
         public GeoPosition GeoPosition { get; set; }
@@ -171,22 +171,22 @@ namespace SafetyCulture.Model.Incidents
         public string Id { get; set; }
 
         [JsonPropertyName("token")]
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
 
         [JsonPropertyName("filename")]
-        public string Filename { get; set; }
+        public string Filename { get; set; } = string.Empty;
 
         [JsonPropertyName("media_type")]
-        public string MediaType { get; set; }
+        public string MediaType { get; set; } = string.Empty;
     }
 
     public class IncidentRoot
     {
         [JsonPropertyName("incidents")]
-        public List<Incident> Incidents { get; set; }
+        public List<Incident> Incidents { get; set; } = [];
         
         [JsonPropertyName("next_page_token")]
-        public string NextPageToken { get; set; }
+        public string NextPageToken { get; set; } = string.Empty;
 
         [JsonPropertyName("total")]
         public int? Total { get; set; }
@@ -201,16 +201,16 @@ namespace SafetyCulture.Model.Incidents
         public string Name { get; set; }
 
         [JsonPropertyName("region")]
-        public string Region { get; set; }
+        public string Region { get; set; } = string.Empty;
 
         [JsonPropertyName("area")]
-        public string Area { get; set; }
+        public string Area { get; set; } = string.Empty;
     }
 
     public class IssueTask
     {
         [JsonPropertyName("task_id")]
-        public string TaskId { get; set; }
+        public string TaskId { get; set; } = string.Empty;
 
         [JsonPropertyName("creator")]
         public Creator Creator { get; set; }
@@ -228,16 +228,16 @@ namespace SafetyCulture.Model.Incidents
         public DateTime? DueAt { get; set; }
 
         [JsonPropertyName("priority_id")]
-        public string PriorityId { get; set; }
+        public string PriorityId { get; set; } = string.Empty;
 
         [JsonPropertyName("status_id")]
-        public string StatusId { get; set; }
+        public string StatusId { get; set; } = string.Empty;
 
         [JsonPropertyName("collaborators")]
-        public List<Collaborator> Collaborators { get; set; }
+        public List<Collaborator> Collaborators { get; set; } = [];
 
         [JsonPropertyName("template_id")]
-        public string TemplateId { get; set; }
+        public string TemplateId { get; set; } = string.Empty;
 
         [JsonPropertyName("inspection")]
         public Inspection Inspection { get; set; }
@@ -252,7 +252,7 @@ namespace SafetyCulture.Model.Incidents
         public DateTime? ModifiedAt { get; set; }
 
         [JsonPropertyName("references")]
-        public List<object> References { get; set; }
+        public List<object> References { get; set; } = [];
 
         [JsonPropertyName("completed_at")]
         public DateTime? CompletedAt { get; set; }
@@ -264,16 +264,16 @@ namespace SafetyCulture.Model.Incidents
         public object Status { get; set; }
 
         [JsonPropertyName("asset_id")]
-        public string AssetId { get; set; }
+        public string AssetId { get; set; } = string.Empty;
 
         [JsonPropertyName("asset")]
         public object Asset { get; set; }
 
         [JsonPropertyName("action_label")]
-        public List<object> ActionLabel { get; set; }
+        public List<object> ActionLabel { get; set; } = [];
 
         [JsonPropertyName("unique_id")]
-        public string UniqueId { get; set; }
+        public string UniqueId { get; set; } = string.Empty;
 
         [JsonPropertyName("type")]
         public string Type { get; set; }

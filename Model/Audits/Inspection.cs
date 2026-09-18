@@ -38,10 +38,10 @@ namespace SafetyCulture.Model.Audits
         public DateTime? CompletedAt { get; set; }
 
         [JsonPropertyName("media")]
-        public List<InspectionMedium> Media { get; set; }
+        public List<InspectionMedium> Media { get; set; } = [];
 
         [JsonPropertyName("revision_id")]
-        public string RevisionId { get; set; }
+        public string RevisionId { get; set; } = string.Empty;
 
         [JsonPropertyName("site")]
         public Site Site { get; set; }
@@ -50,7 +50,7 @@ namespace SafetyCulture.Model.Audits
         public object StartedOn { get; set; }
 
         [JsonPropertyName("revision_key")]
-        public string RevisionKey { get; set; }
+        public string RevisionKey { get; set; } = string.Empty;
 
         [JsonPropertyName("start_trigger")]
         public object StartTrigger { get; set; }
@@ -75,13 +75,13 @@ namespace SafetyCulture.Model.Audits
         public string Id { get; set; }
 
         [JsonPropertyName("token")]
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
 
         [JsonPropertyName("filename")]
-        public string Filename { get; set; }
+        public string Filename { get; set; } = string.Empty;
 
         [JsonPropertyName("media_type")]
-        public string MediaType { get; set; }
+        public string MediaType { get; set; } = string.Empty;
     }
 
     public class ModifiedBy
