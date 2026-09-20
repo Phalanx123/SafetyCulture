@@ -272,13 +272,39 @@ namespace SafetyCulture.Client
         }
 
         /// <summary>
-        /// Searches assets by keyword (matched against code and fields), for use in typeahead
+        /// The page size SafetyCulture uses when a request does not name one.
+        /// </summary>
+        public const int DefaultAssetPageSize = 50;
+
+        /// <summary>
+        /// The largest page SafetyCulture will answer with; a larger request is rejected.
+        /// </summary>
+        public const int MaxAssetPageSize = 100;
+
+        /// <summary>
+        /// Lists the organisation's assets, optionally narrowed by keyword, for use in typeahead
         /// pickers. Endpoint: POST /assets/v1/assets/list
         /// </summary>
+        /// <param name="search">
+        /// Key words to match. Every member of the body is optional, and SafetyCulture treats this
+        /// as a keyword match rather than a "no filter" marker, so whitespace is sent as no search
+        /// at all - an empty string is a search for nothing, which is why an unfiltered picker came
+        /// back with no assets to show.
+        /// </param>
+        /// <param name="pageSize">Assets per page. Clamped to the 1-100 SafetyCulture accepts.</param>
+        /// <param name="pageToken">The <see cref="ListAssetsResponse.NextPageToken"/> of the previous page.</param>
+        /// <param name="state">
+        /// Limits the results to one <see cref="AssetState"/>, e.g. only the active assets. Null
+        /// returns both active and archived.
+        /// </param>
+        /// <param name="orderBy">How to sort the results. SafetyCulture sorts newest first by default.</param>
+        /// <param name="ct"></param>
         public async Task<OneOf<ListAssetsResponse, ResponseError>> ListAssetsAsync(
             string? search = null,
-            int pageSize = 50,
+            int pageSize = DefaultAssetPageSize,
             string? pageToken = null,
+            string? state = null,
+            AssetsOrderBy? orderBy = null,
             CancellationToken ct = default)
         {
             var request = new RestRequest("/assets/v1/assets/list", Method.Post);
@@ -291,9 +317,11 @@ namespace SafetyCulture.Client
 
             var body = new ListAssetsRequest
             {
-                Search = search,
-                PageSize = pageSize,
-                PageToken = pageToken
+                Search = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+                PageSize = Math.Clamp(pageSize, 1, MaxAssetPageSize),
+                PageToken = string.IsNullOrWhiteSpace(pageToken) ? null : pageToken,
+                AssetFilters = state is null ? null : [new AssetFilter { State = state }],
+                OrderBy = orderBy
             };
             var jsonContent = JsonSerializer.Serialize(body, jsonOptions);
             request.AddStringBody(jsonContent, DataFormat.Json);
@@ -303,14 +331,77 @@ namespace SafetyCulture.Client
             if (string.IsNullOrWhiteSpace(response.Content))
                 return EmptyBodyError(response);
 
-            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
-            {
-                var data = JsonSerializer.Deserialize<ListAssetsResponse>(response.Content, jsonOptions);
-                return data!;
-            }
+            var succeeded = (int)response.StatusCode >= 200 && (int)response.StatusCode <= 299;
 
-            var error = JsonSerializer.Deserialize<ResponseError>(response.Content, jsonOptions);
-            return error!;
+            try
+            {
+                if (succeeded)
+                    return JsonSerializer.Deserialize<ListAssetsResponse>(response.Content, jsonOptions)!;
+
+                return JsonSerializer.Deserialize<ResponseError>(response.Content, jsonOptions)!;
+            }
+            catch (JsonException ex)
+            {
+                // One unreadable asset must not take the whole list down: the callers show the
+                // reason rather than an empty picker with nothing to explain it.
+                return new ResponseError
+                {
+                    Message =
+                        $"Failed to parse the asset list response (status {(int)response.StatusCode}): {ex.Message}. Content: {response.Content}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Lists assets a page at a time until <paramref name="limit"/> have been collected or
+        /// SafetyCulture stops returning a next page token. A single call only ever answers with
+        /// one page, so anything that needs more than the first 50 assets has to follow the token.
+        /// </summary>
+        /// <returns>
+        /// The assets collected, or the first error SafetyCulture answered with. An error on a
+        /// later page is returned rather than the partial list, so a half-loaded picker never
+        /// reads as the whole of the organisation's assets.
+        /// </returns>
+        public async Task<OneOf<List<Asset>, ResponseError>> ListAllAssetsAsync(
+            string? search = null,
+            int limit = DefaultAssetPageSize,
+            string? state = null,
+            AssetsOrderBy? orderBy = null,
+            CancellationToken ct = default)
+        {
+            if (limit <= 0)
+                return new List<Asset>();
+
+            var assets = new List<Asset>();
+            string? pageToken = null;
+
+            do
+            {
+                var remaining = limit - assets.Count;
+                var result = await ListAssetsAsync(
+                    search,
+                    Math.Min(remaining, MaxAssetPageSize),
+                    pageToken,
+                    state,
+                    orderBy,
+                    ct);
+
+                if (!result.IsT0)
+                    return result.AsT1;
+
+                var page = result.AsT0;
+                if (page.Assets is { Count: > 0 })
+                    assets.AddRange(page.Assets);
+
+                pageToken = page.NextPageToken;
+
+                // SafetyCulture keeps answering with a token on the last page of some collections,
+                // so an empty page ends the walk as well as a missing token.
+                if (page.Assets is null or { Count: 0 })
+                    break;
+            } while (!string.IsNullOrEmpty(pageToken) && assets.Count < limit && !ct.IsCancellationRequested);
+
+            return assets.Count > limit ? assets.GetRange(0, limit) : assets;
         }
 
         public async Task<Asset> UpdateAsset(Asset asset)
