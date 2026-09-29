@@ -8,6 +8,7 @@ using SafetyCulture.Model.Audits;
 using SafetyCulture.Model.DataFeeds;
 using SafetyCulture.Model.Folders;
 using SafetyCulture.Model.Incidents;
+using SafetyCulture.Model.Permissions;
 using SafetyCulture.Model.ResponseSets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -654,6 +655,139 @@ namespace SafetyCulture.Client
 
             return allUsers;
         }
+
+        private const int PermissionSetPageSize = 100;
+        private const int PermissionSetMaxPages = 20;
+
+        /// <summary>
+        /// Lists the organisation's permission sets, following the offset paging.
+        /// Endpoint: POST /permissions/v1/permission_sets
+        /// </summary>
+        public async Task<OneOf<List<SafetyCulturePermissionSet>, ResponseError>> GetPermissionSetsAsync()
+        {
+            var permissionSets = new List<SafetyCulturePermissionSet>();
+            var jsonOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.Never };
+
+            for (var page = 0; page < PermissionSetMaxPages; page++)
+            {
+                var request = new RestRequest("/permissions/v1/permission_sets", Method.Post);
+                request.AddStringBody(JsonSerializer.Serialize(
+                    new ListPermissionSetsRequest { Limit = PermissionSetPageSize, Offset = permissionSets.Count },
+                    jsonOptions), DataFormat.Json);
+
+                var response = await Client.ExecuteAsync(request);
+
+                if ((int)response.StatusCode < 200 || (int)response.StatusCode > 299)
+                    return ErrorFrom(response, jsonOptions);
+
+                if (string.IsNullOrWhiteSpace(response.Content))
+                    return EmptyBodyError(response);
+
+                var (received, total) = ReadPermissionSetsPage(response.Content);
+                permissionSets.AddRange(received);
+
+                if (received.Count == 0 || total is null || permissionSets.Count >= total)
+                    break;
+            }
+
+            return permissionSets;
+        }
+
+        /// <summary>
+        /// Puts a user on a permission set.
+        /// Endpoint: POST /permissions/v1/permission_set/assign
+        /// </summary>
+        public async Task<OneOf<bool, ResponseError>> AssignPermissionSetAsync(string userId, string permissionSetId)
+        {
+            var request = new RestRequest("/permissions/v1/permission_set/assign", Method.Post);
+            request.AddStringBody(JsonSerializer.Serialize(
+                new AssignPermissionSetRequest { UserIds = [userId], Id = permissionSetId }), DataFormat.Json);
+
+            var response = await Client.ExecuteAsync(request);
+
+            if ((int)response.StatusCode >= 200 && (int)response.StatusCode <= 299)
+                return true;
+
+            return ErrorFrom(response, new JsonSerializerOptions());
+        }
+
+        private static ResponseError ErrorFrom(RestResponse response, JsonSerializerOptions jsonOptions)
+        {
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
+            try
+            {
+                var error = JsonSerializer.Deserialize<ResponseError>(response.Content,
+                    new JsonSerializerOptions(jsonOptions) { PropertyNameCaseInsensitive = true });
+
+                return string.IsNullOrWhiteSpace(error?.Message)
+                    ? new ResponseError
+                    {
+                        Message = $"SafetyCulture API returned status {(int)response.StatusCode}: {response.Content}"
+                    }
+                    : error;
+            }
+            catch (JsonException)
+            {
+                return new ResponseError
+                {
+                    Message = $"SafetyCulture API returned status {(int)response.StatusCode}: {response.Content}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Reads a page of permission sets without depending on one exact response shape: each entry may
+        /// carry its id and name directly or inside an <c>identifier</c> object, and the total may be a
+        /// number or a string (protobuf writes 64-bit integers as strings).
+        /// </summary>
+        private static (List<SafetyCulturePermissionSet> PermissionSets, int? Total) ReadPermissionSetsPage(
+            string content)
+        {
+            using var document = JsonDocument.Parse(content);
+            var root = document.RootElement;
+
+            var list = new List<SafetyCulturePermissionSet>();
+            if (root.TryGetProperty("permission_sets", out var items) && items.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in items.EnumerateArray())
+                {
+                    var source = item.TryGetProperty("identifier", out var identifier)
+                                 && identifier.ValueKind == JsonValueKind.Object
+                        ? identifier
+                        : item;
+
+                    var id = StringOf(source, "id");
+                    if (id is null)
+                        continue;
+
+                    list.Add(new SafetyCulturePermissionSet
+                    {
+                        Id = id,
+                        Name = StringOf(source, "name"),
+                        Description = StringOf(source, "description")
+                    });
+                }
+            }
+
+            int? total = null;
+            if (root.TryGetProperty("total_results", out var totalElement))
+            {
+                if (totalElement.ValueKind == JsonValueKind.Number && totalElement.TryGetInt32(out var number))
+                    total = number;
+                else if (totalElement.ValueKind == JsonValueKind.String
+                         && int.TryParse(totalElement.GetString(), out var parsed))
+                    total = parsed;
+            }
+
+            return (list, total);
+        }
+
+        private static string? StringOf(JsonElement element, string property) =>
+            element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String
+                ? value.GetString()
+                : null;
 
         public async Task<OneOf<InspectionExportResult, ResponseError>> ExportInspection(InspectionExport export)
         {
