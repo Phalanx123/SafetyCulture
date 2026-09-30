@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using OneOf;
+using OneOf.Types;
 using RestSharp;
 using SafetyCulture.Converters;
 using SafetyCulture.Model;
@@ -488,13 +489,90 @@ namespace SafetyCulture.Client
             throw new InvalidOperationException("Failed to update folder", response.ErrorException);
         }
 
-        public async Task<AssetSiteUpdateResponse> UpdateSiteAssets(Guid safetyCultureFolderID,
-            IEnumerable<Guid> assetIds)
+        /// <summary>
+        /// Moves one asset to a site, leaving every other attribute of the asset alone.
+        /// Endpoint: PUT /assets/v1/assets/bulk with <c>update_mask=site</c>.
+        /// </summary>
+        /// <remarks>
+        /// The single-asset PATCH replaces the asset's custom fields with whatever the body carries, so
+        /// a body naming only the site risks clearing them. The bulk update applies only what the mask
+        /// names. A site change is propagated through the asset hierarchy by a background operation on
+        /// SafetyCulture's side, so the asset may show its old site for a short while after success.
+        /// </remarks>
+        /// <param name="assetId">The asset to move.</param>
+        /// <param name="siteId">The site (a directory folder of type site) to move it to.</param>
+        /// <param name="ct">Cancellation token.</param>
+        public async Task<OneOf<Success, ResponseError>> SetAssetSiteAsync(Guid assetId, Guid siteId,
+            CancellationToken ct = default)
         {
-            var request = new RestRequest("assets/v1/assets:SetSiteForAssets", Method.Post);
-            request.AddJsonBody(new { site = safetyCultureFolderID, asset_ids = assetIds });
-            var response = await Client.ExecuteAsync<AssetSiteUpdateResponse>(request);
-            return response.Data!;
+            var request = new RestRequest("/assets/v1/assets/bulk", Method.Put);
+            request.AddStringBody(JsonSerializer.Serialize(new BulkUpdateAssetsRequest
+            {
+                Assets = [new BulkUpdateAsset { Id = assetId, Site = new BulkUpdateAssetSite { Id = siteId } }],
+                UpdateMask = BulkUpdateAssetsRequest.SiteMask
+            }), DataFormat.Json);
+
+            var response = await Client.ExecuteAsync(request, ct);
+
+            if (!response.IsSuccessful)
+                return ReadError(response, "Setting the asset's site failed");
+
+            if (string.IsNullOrWhiteSpace(response.Content))
+                return EmptyBodyError(response);
+
+            BulkUpdateAssetsResponse? result;
+            try
+            {
+                result = JsonSerializer.Deserialize<BulkUpdateAssetsResponse>(response.Content);
+            }
+            catch (JsonException ex)
+            {
+                return new ResponseError
+                {
+                    Message = $"Could not read SafetyCulture's answer to the site change: {ex.Message}. Content: {response.Content}"
+                };
+            }
+
+            var failure = result?.FailedAssets?.FirstOrDefault(x => x.Id == assetId.ToString());
+            if (failure is not null)
+            {
+                return new ResponseError
+                {
+                    Code = failure.Status?.Code ?? 0,
+                    Message = failure.Status?.Message ?? $"SafetyCulture refused to move asset {assetId}."
+                };
+            }
+
+            return result?.UpdatedAssets?.Any(x => x.Id == assetId.ToString()) == true
+                ? new Success()
+                : new ResponseError
+                {
+                    Message = $"SafetyCulture reported neither success nor failure for asset {assetId}. Content: {response.Content}"
+                };
+        }
+
+        private static ResponseError ReadError(RestResponse response, string action)
+        {
+            if (!string.IsNullOrWhiteSpace(response.Content))
+            {
+                try
+                {
+                    var error = JsonSerializer.Deserialize<ResponseError>(response.Content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (error is not null && !string.IsNullOrWhiteSpace(error.Message))
+                        return error;
+                }
+                catch (JsonException)
+                {
+                    // Not an error document; report the raw body below.
+                }
+            }
+
+            return new ResponseError
+            {
+                Code = (int)response.StatusCode,
+                Message = $"{action}. StatusCode: {(int)response.StatusCode} ({response.StatusCode}). Content: {response.Content}"
+            };
         }
 
         public async Task<InspectionDataFeed> GetInspectionDataFeedAsync(DateTimeOffset? modifiedAfter,
